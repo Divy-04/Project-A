@@ -1,26 +1,664 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------
+   Design tokens
+   Palette derived from the AADI ENTERPRISE business card:
+   a warm vermillion red on white, used sparingly against near-black
+   text and a warm off-white ground.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-brand: #d93a28;
+  --color-brand-dark: #b0291b;
+  --color-brand-tint: #fdf2f0;
+
+  /* Red for SMALL TEXT only. The business-card red is 4.35:1 on the ground
+     and 3.63:1 on the slate — both under the 4.5 AA needs for 11px caps, so
+     the eyebrow labels were failing everywhere. These two shift it just far
+     enough to pass (4.7 and 5.9) and are near-indistinguishable at that size.
+     Buttons, fills, icons and large type keep the card red exactly. */
+  --color-brand-ink: #cf3624;
+  --color-brand-lift: #f2705a;
+
+  --color-ink: #141414;
+  --color-ink-2: #4a4744;
+  --color-ink-3: #6b665f; /* holds 4.5:1 on --color-ground at 11px caps */
+
+  --color-ground: #faf9f7;
+  --color-surface: #ffffff;
+  --color-line: #e8e4df;
+  --color-line-strong: #d5cfc7;
+
+  --color-slate: #1c1b1a;
+  --color-slate-2: #2a2825;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
+  /* Height of the fixed mobile chrome, declared once so anything that has to
+     clear it can just say so. The tab bar is 0.5rem of top padding plus a
+     3.25rem row plus a bottom padding that grows to the home-indicator inset
+     on the phones that have one. `--dock-h` is the gallery's division rail,
+     which docks on top of the tab bar on that one page. */
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --tabbar-h: calc(3.75rem + max(0.5rem, env(safe-area-inset-bottom)));
+    --dock-h: 3.5rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Page gutter + max width, used by every section */
+  .shell {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Small letterspaced caps used for eyebrows and section labels */
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* Hairline rule that sits above section labels */
+  .rule-top {
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* Editorial masthead type. Scales continuously with the viewport rather
+     than stepping at breakpoints, so the line breaks stay deliberate at every
+     width. The clamp floor is set for a 360px phone. */
+  .display {
+    font-size: clamp(2.5rem, 1.1rem + 5.9vw, 5.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+
+  /* Bento cell. One border radius, one hairline, one padding scale — the
+     grid does the composing, the cell stays dumb. */
+  .bento {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .bento {
+      padding: 2rem;
+    }
+  }
+
+  /* The footer's bottom rule has to clear the fixed mobile chrome, and on
+     /gallery there is a second bar docked above the tab bar — hence the
+     `:has()`. Where `:has()` is unsupported the footer keeps the plain
+     tab-bar allowance, which costs a few pixels of the copyright line on one
+     page rather than breaking the layout on every page. */
+  .footer-base {
+    padding-bottom: calc(var(--tabbar-h) + 1.5rem);
+  }
+
+  body:has(.gallery-dock) .footer-base {
+    padding-bottom: calc(var(--tabbar-h) + var(--dock-h) + 1.5rem);
+  }
+
+  @media (min-width: 1024px) {
+    .footer-base,
+    body:has(.gallery-dock) .footer-base {
+      padding-bottom: 1.5rem;
+    }
+  }
+
+  /* Horizontal rail — the division chips and the project cards both use it.
+     The rail bleeds through the page gutter so a half-scrolled card is not
+     clipped by it; scroll padding puts that gutter back, so the first item
+     still snaps flush with the copy above rather than hard against the
+     screen edge. */
+  .rail {
+    scrollbar-width: none;
+    scroll-padding-inline: 1.25rem;
+    overscroll-behavior-x: contain;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .rail {
+      scroll-padding-inline: 2rem;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Texture and depth.
+
+   There is not a single photograph in this project and there will not be
+   until the client supplies them, so depth has to come from things that
+   weigh nothing: a noise tile, two radial washes and a set-out grid. All
+   of it is decorative — pointer-events: none, painted behind the content,
+   and kept faint enough that it cannot touch text contrast.
+
+   Each of these is a background layer on the section itself or a ::before,
+   never an extra element in the flow, so none of it can shift layout.
+   ------------------------------------------------------------------ */
+
+/* Film grain. One 160px feTurbulence tile, repeated — a few hundred bytes
+   inline, no network request. Sits over the content the way real grain
+   does, which is why it is ::after rather than ::before. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Grain reads heavier on a light ground than on a dark one. */
+.grain-light::after {
+  opacity: 0.03;
+}
+
+/* Set-out grid, the same language as the drawings in the scroll section.
+   Masked to a radial falloff so it is strongest at the edges of a band and
+   gone by the time it reaches the paragraph in the middle — decoration must
+   never sit behind small type it could cost contrast. */
+.setout {
+  position: relative;
+}
+
+.setout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 72px 72px;
+  /* Tight on purpose. At a wider extent the grid ran all the way across and
+     sat behind the body copy on the left, which is both ugly and the one
+     place decoration must never be. */
+  mask-image: radial-gradient(66% 78% at 93% 6%, #000 0%, transparent 70%);
+}
+
+/* Dark bands get the grid in reverse, so it lifts the flat black. */
+.setout-dark::before {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+}
+
+/* Radial washes. A background-image layer on the section itself, so it
+   composes over the section's own colour with no stacking to manage. */
+.wash-brand {
+  background-image: radial-gradient(
+    58rem 30rem at 88% -15%,
+    color-mix(in srgb, var(--color-brand) 10%, transparent),
+    transparent 68%
+  );
+}
+
+.wash-dark {
+  background-image: radial-gradient(
+    52rem 26rem at 82% -20%,
+    rgb(255 255 255 / 0.07),
+    transparent 66%
+  );
+}
+
+/* ------------------------------------------------------------------
+   Placeholder texture — a subtle diagonal hatch so empty image slots
+   read as "photo goes here", not as a broken asset.
+   ------------------------------------------------------------------ */
+.ph-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color-ink) 5%, transparent) 0 1px,
+    transparent 1px 10px
+  );
+}
+
+.ph-hatch-light {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(255 255 255 / 0.06) 0 1px,
+    transparent 1px 10px
+  );
+}
+
+/* ------------------------------------------------------------------
+   No generic scroll-reveal animation.
+   A view()-timeline reveal was tried and removed: any element that never
+   registers an "entry" phase stays stuck at opacity 0, which hides real
+   content. Not a trade worth making on a site whose whole job is to be
+   found and read.
+
+   Everything in the Motion block below obeys the rule that came out of
+   that: no element starts hidden. Each one is either a hover state, a
+   toggle the reader asked for, or decoration written on top of a value
+   that is already correct in the HTML.
+   ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------
+   Motion
+   ------------------------------------------------------------------ */
+
+/* Cards ease up to full as they slide onto the rail. This is the only
+   scroll-driven effect on the site, and it keeps the rule the removed
+   `.reveal` broke: the element's base state is already finished. The
+   keyframes run only where `animation-timeline` is supported, and even there
+   the fill holds an off-screen card at 45% opacity rather than 0 — dimmed,
+   never hidden. No support, or reduced motion asked for, and the card is
+   simply static. */
+@keyframes rail-in {
+  from {
+    opacity: 0.45;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view(x)) {
+    .rail-item {
+      animation: rail-in linear both;
+      animation-timeline: view(x);
+      animation-range: entry 10% entry 90%;
+    }
+  }
+}
+
+/* Bottom tab bar: the active tab's pill fills rather than the icon jumping. */
+.tab-pill {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+/* Ticker. One keyframe on a duplicated track — no JS, no scroll listener.
+   The track is twice the content width, so translating it exactly -50%
+   lands on the start of the second copy and the loop is seamless. */
+.marquee {
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 46s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* FAQ accordion. `interpolate-size` lets height animate to `auto`; where it
+   is unsupported the panel simply snaps open, which is a fine outcome. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .faq-panel > * {
+    overflow: hidden;
+  }
+
+  .faq[open] .faq-panel {
+    grid-template-rows: 1fr;
+  }
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The plus loses its vertical stroke and becomes a minus */
+.faq-tick {
+  transition: transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.faq[open] .faq-tick {
+  transform: translateX(-50%) scaleY(0);
+}
+
+/* Index rows tint and step in from the gutter on hover */
+.index-row {
+  transition: background-color 220ms ease;
+}
+
+.index-row:hover {
+  background-color: color-mix(in srgb, var(--color-ink) 3%, transparent);
+}
+
+.index-title {
+  transition: transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (min-width: 640px) {
+  .index-row:hover .index-title {
+    transform: translateX(10px);
+  }
+}
+
+/* Underline that wipes in from the left rather than fading */
+.link-wipe {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.link-wipe:hover {
+  background-size: 100% 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+
+  .faq-panel,
+  .faq-tick,
+  .index-row,
+  .index-title,
+  .link-wipe,
+  .tab-pill {
+    transition: none;
+  }
+
+  /* A rail is still swipeable with reduced motion asked for — it just does
+     not smooth-scroll or snap under you. */
+  .rail {
+    scroll-behavior: auto;
+  }
+}
+
+/* ------------------------------------------------------------------
+   "How it works" — scroll-driven scene.
+
+   SEO contract, deliberately enforced by the CSS below:
+   1. All four steps' headings and body copy sit in the HTML at full
+      opacity, one per panel. They are moved out of view by a transform on
+      the strip — never display:none, visibility:hidden or opacity:0.
+      Googlebot renders without scrolling, so anything gated behind scroll
+      progress would be invisible to it; a translated panel is not.
+   2. The illustration is aria-hidden and carries no information that isn't
+      already in the step copy. That is what makes it safe to move.
+   3. The pin, the strip and the spacer heights all live in these BASE
+      rules, not in the [data-enhanced] ones — so hydration changes no
+      geometry and the section contributes zero CLS.
+   4. Under prefers-reduced-motion the strip unwinds into a plain vertical
+      stack of full-height panels, with every scrubbed value resolved to
+      its finished state.
+   ------------------------------------------------------------------ */
+
+/* The scene is pinned to the whole viewport — the header floats over it. */
+.hiw-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* The camera. Four full-screen panels in a strip four screens wide; --pan
+   slides it one panel at a time. Without JS, --pan is 0 and panel one shows. */
+.hiw-strip {
+  display: flex;
+  width: 400%;
+  transform: translateX(calc(var(--pan, 0) * -25%));
+}
+
+/* --sp is the panel's own scroll progress, written once per frame by the rig.
+   It defaults to 1 rather than 0 so that with no JS at all — Googlebot, a
+   failed hydration, reduced motion — every scene renders in its finished
+   state instead of frozen mid-flight. The rig starts writing real values
+   300px before the section reaches the viewport, so nothing is ever seen
+   sitting at this default. */
+.hiw-panel {
+  flex: 0 0 25%;
+  width: 25%;
+  --sp: 1;
+}
+
+.hiw-progress-bar {
+  transform: scaleX(var(--gp, 0));
+  transform-origin: left center;
+}
+
+/* Each panel carries its own copy, so there is no dimming to manage: the
+   step that is on screen is the step you can read. All four blocks stay in
+   the document at full opacity — they are translated out of view, never
+   hidden — which is what keeps the copy indexable. */
+
+/* ---- Ramps -------------------------------------------------------------
+   Each sets --t, the local 0 → 1 progress that the motion classes below
+   read. Everything resolves by ~0.66 of a step, before the camera starts
+   panning at HOLD, so no scene is still moving as it leaves the screen. */
+.hiw-ra {
+  --t: clamp(0, calc(var(--sp, 1) / 0.4), 1);
+}
+.hiw-rb {
+  --t: clamp(0, calc(var(--sp, 1) / 0.62), 1);
+}
+.hiw-rc {
+  --t: clamp(0, calc((var(--sp, 1) - 0.44) / 0.22), 1);
+}
+.hiw-rd {
+  --t: clamp(0, calc((var(--sp, 1) - 0.3) / 0.28), 1);
+}
+
+/* Staggered arrival — one part every 0.05 of the step, 0.26 each, so the
+   carcass builds up piece by piece instead of snapping together at once. */
+.hiw-d0 {
+  --t: clamp(0, calc(var(--sp, 1) / 0.26), 1);
+}
+.hiw-d1 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.05) / 0.26), 1);
+}
+.hiw-d2 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.1) / 0.26), 1);
+}
+.hiw-d3 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.15) / 0.26), 1);
+}
+.hiw-d4 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.2) / 0.26), 1);
+}
+.hiw-d5 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.25) / 0.26), 1);
+}
+.hiw-d6 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.3) / 0.26), 1);
+}
+.hiw-d7 {
+  --t: clamp(0, calc((var(--sp, 1) - 0.35) / 0.26), 1);
+}
+
+/* ---- Motion ------------------------------------------------------------
+   Transform and opacity only, so every scene stays on the compositor. The
+   `1` fallback means an element with no ramp class renders resolved. */
+.hiw-fromL {
+  transform: translateX(calc((1 - var(--t, 1)) * -132px));
+  opacity: var(--t, 1);
+}
+.hiw-fromR {
+  transform: translateX(calc((1 - var(--t, 1)) * 132px));
+  opacity: var(--t, 1);
+}
+.hiw-fromT {
+  transform: translateY(calc((1 - var(--t, 1)) * -108px));
+  opacity: var(--t, 1);
+}
+.hiw-fromB {
+  transform: translateY(calc((1 - var(--t, 1)) * 108px));
+  opacity: var(--t, 1);
+}
+.hiw-back {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.84 + var(--t, 1) * 0.16));
+  opacity: var(--t, 1);
+}
+.hiw-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.3 + var(--t, 1) * 0.7));
+  opacity: var(--t, 1);
+}
+
+/* Scene 01 — the tape is pulled across and the readout counts up with it. */
+.hiw-tape {
+  stroke-dasharray: 360;
+  stroke-dashoffset: calc((1 - var(--t, 1)) * 360px);
+}
+.hiw-tip {
+  transform: translateX(calc(var(--t, 1) * 360px));
+}
+.hiw-odo {
+  transform: translateY(calc(var(--t, 1) * -336px));
+}
+
+/* Scene 03 — the van runs right to left, wheels turning with it. It enters
+   off the right edge of the frame and pulls up short of the house rather than
+   driving over it. */
+.hiw-truck {
+  transform: translateX(calc(196px - var(--t, 1) * 206px));
+}
+.hiw-speed {
+  transform: translateX(calc(120px - var(--t, 1) * 200px));
+  opacity: max(0, calc(1 - var(--t, 1) * 1.5));
+}
+.hiw-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(calc(var(--sp, 1) * -900deg));
+}
+
+/* Scene 04 — the unit seats, the bead runs, the job is signed off. */
+.hiw-seat {
+  transform: translateX(calc((1 - var(--t, 1)) * 215px));
+}
+.hiw-bead {
+  stroke-dasharray: 320;
+  stroke-dashoffset: calc((1 - var(--t, 1)) * 320px);
+}
+.hiw-badge {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.4 + var(--t, 1) * 0.6));
+  opacity: var(--t, 1);
+}
+.hiw-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(1 + var(--t, 1) * 1.1));
+  opacity: max(0, calc(0.65 - var(--t, 1) * 0.65));
+}
+
+/* Drawing annotation, dropped once the card is phone-width — at that size the
+   type is a few pixels tall and reads as noise. */
+@media (max-width: 767px) {
+  .hiw-fine {
+    display: none;
+  }
+}
+
+/* Reduced motion: the rig never enhances, so the strip unwinds into a plain
+   vertical stack. --sp stays at its base 1, which resolves every scene to its
+   finished state without a single per-rule override. */
+@media (prefers-reduced-motion: reduce) {
+  .hiw-pin {
+    position: static;
+    height: auto;
+  }
+
+  .hiw-strip {
+    display: block;
+    width: 100%;
+    transform: none;
+  }
+
+  .hiw-panel {
+    width: 100%;
+    padding-block: 2.5rem;
+  }
+
+  .hiw-spacers,
+  .hiw-progress-bar {
+    display: none;
+  }
 }
