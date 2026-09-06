@@ -23,6 +23,14 @@ SEO-clean: static HTML, real copy in the markup, fast, no CLS.
 Within step 1: homepage first, and the client approves it before the other
 three pages get built. Do not start Sanity or deployment work early.
 
+**Where it stands (6 Sep 2026):** step 1 approved; step 2 built — the Studio
+is deployed and the site reads Sanity (see **Sanity** below). The enquiry form
+emails via Brevo — decided 6 Sep in place of Telegram, wired and tested. Step 3
+not started.
+
+**Next:** an SEO pass on 7 Sep 2026 (see **SEO pass** below), then deployment
+to Cloudflare under **aadienterprise.in** — domain decided, not yet bought.
+
 Because deployment comes last, the enquiry form being unconfigured during
 step 1 costs nothing: the site is not public, so there is no real enquiry to
 lose. It must be wired in step 2 regardless — it cannot ship disconnected.
@@ -59,7 +67,8 @@ JSON-LD rides along with `Breadcrumbs.tsx` on every nested page.
 Shared building blocks: `PageHeader`, `Breadcrumbs`, `ProjectCard`,
 `ProjectIndex`, `GalleryBrowser`, `Swatches`, `SpecList`, `Faqs`, `Marquee`,
 `CountUp`, `EnquiryForm`, `Backdrop`, `CtaBand` (moved out of `home/` — every
-page uses it), `SectionHead`, `Placeholder`, `Button`, `FooterMap` (takes
+page uses it), `SectionHead`, `Placeholder`, `Photo` (a Sanity image, or the
+`Placeholder` in the same footprint), `Button`, `FooterMap` (takes
 `tone="dark" | "light"` and a `ratio`), `MobileTabBar`.
 
 `ProjectCard` has two variants. `plain` (the default) is the editorial one —
@@ -78,7 +87,8 @@ empty other than image". He was right, and it mattered more than it looked:
 a page with nothing to read has nothing to rank.
 
 The fix was content that does not depend on photography ever arriving, and it
-lives in `services.ts` per division:
+lives on each **Division** document in Sanity (seeded from the old
+`services.ts`):
 
 - **`finishGroups`** — named colour swatches, rendered as CSS boxes by
   `Swatches.tsx`. The single most useful thing on the page: someone choosing a
@@ -106,6 +116,13 @@ they are layout rather than motion and so cost nothing at runtime:
 - **Bento grid.** `.bento` cell class plus an asymmetric CSS grid. This is
   what fixes "empty other than image": the owner portrait becomes one cell
   among six rather than a large lonely rectangle waiting on a photograph.
+  At `lg` the portrait cell spans the three rows beside it and the slot
+  fills that height instead of carrying its own aspect ratio (`Placeholder
+  fill`), so the photograph can never outgrow the block and the whole grid
+  fits one laptop screen. The first cut gave it a fixed 4:5 slot two columns
+  wide; at a 1536px viewport that ran past 900px and stretched the stat cards
+  to match — flagged during review. Below `lg` there is no row to borrow
+  from, so the slot goes back to 4:5.
 - **Sticky chapters.** `lg:sticky lg:top-28` on the left column so a section
   heading holds while its narrative scrolls past. Pure CSS.
 
@@ -185,8 +202,8 @@ so the server renders every project and nothing is hidden on first paint.**
 Filtering only ever removes items in response to a click. Verified — all nine
 projects are in the served HTML.
 
-Divisions come from `services.ts` rather than being hard-coded, so a fourth
-division from Sanity needs no edit here. A CSS-only `:checked` filter was
+Divisions come from Sanity (`getDivisions`) rather than being hard-coded, so a
+fourth division needs no edit here. A CSS-only `:checked` filter was
 considered and rejected for exactly that reason: it would have pinned the
 division slugs into a stylesheet.
 
@@ -297,39 +314,150 @@ Every one of these is disabled or made static under `prefers-reduced-motion`.
 
 ## Enquiry form
 
-`/contact` posts to `src/app/api/enquiry/route.ts`, which relays to Telegram.
+`/contact` posts to `src/app/api/enquiry/route.ts`, which sends one email per
+enquiry through **Brevo** (free plan, 300/day). It was Telegram until 6 Sep
+2026; the client chose email instead. Only the route changed — the form does
+not know which provider is behind it.
 
-**The bot token must never reach the browser.** Calling `api.telegram.org`
-straight from the form would put it in the page source, and anyone reading it
-could take the bot over. That is the entire reason this route exists — it is
+**The API key must never reach the browser.** Calling Brevo straight from the
+form would put the key in the page source, and anyone reading it could send
+300 emails a day as us. That is the entire reason this route exists — it is
 the only server-side code on the site.
 
 Configure via `.env.local` (see `.env.example`; `.env*` is gitignored):
-`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`. With either missing the endpoint
-returns 503 and the form says "not connected yet" and points at the phone — it
-never shows a thank-you for a message that went nowhere.
+`BREVO_API_KEY`, `ENQUIRY_FROM` (a sender verified in Brevo) and `ENQUIRY_TO`
+(the business Gmail). With any missing the endpoint returns 503 and the form
+says "not connected yet" and points at the phone — it never shows a thank-you
+for a message that went nowhere. Do not "fix" a 503 by hiding the form, faking
+a success state, or stubbing the endpoint — the visible failure plus the phone
+fallback is the point.
 
-**Right now that 503 is the expected state, not a bug.** The client has
-scheduled the bot for the Sanity pass (step 2), so during design review the
-form is meant to fail this way. Do not "fix" it by hiding the form, faking a
-success state, or stubbing the endpoint — the visible failure plus the phone
-fallback is the whole point of building it that way.
+The Brevo account is the developer's (pdivy945@gmail.com), and the sender is
+that address, because a verified sender needs a one-time code from the inbox
+owner and the client was not to hand. Recipients need no verification, so
+enquiries land in the business Gmail regardless. At deployment the sender
+should move to the real domain (Brevo verifies a domain via DNS), which drops
+the developer's address from the From line. The form collects no customer
+email, so there is nothing to reply to — the owner rings the number. The
+email is deliberately plain: read on a phone, the number is the one thing
+that has to be tappable.
 
 A honeypot field catches most bots. Call and WhatsApp remain the primary
 actions and work with no JavaScript; the form is the third option.
 
-**Not started:** Sanity, deployment, real photos, real testimonials.
+**Sanity is wired** (step 2). Every page reads the dataset at build time and
+the Studio is live at https://aadi-enterprise.sanity.studio — see **Sanity**.
 
-Content is hard-coded in `src/data/*.ts`, shaped deliberately to mirror the
-future Sanity documents one-for-one so wiring the CMS is a swap, not a rewrite.
-`projects.ts` holds **three per division on purpose** — the reference photos
-skewed furniture, and an unbalanced gallery is the most visible way that tilt
-gets back in.
+**Not started:** the SEO pass (7 Sep), deployment (and with it the publish →
+rebuild webhook), real photos, real testimonials.
+
+## Sanity
+
+Project `hhvsb0rp`, dataset `production`, **public**. The site reads published
+content anonymously at build time — there is no Sanity credential anywhere in
+the Next app or on the host, and there must not be. The Studio is its own
+package in `studio/` (Sanity v6, hosted at aadi-enterprise.sanity.studio, not
+embedded), so the site bundle carries no editor.
+
+Site-side code:
+
+- `src/sanity/client.ts` — one client. `useCdn: false` because a publish
+  triggers a rebuild within seconds and the CDN can lag it; `perspective:
+  "published"` so drafts never leak.
+- `src/sanity/queries.ts` — every GROQ projection. `types.ts` — the shapes
+  they return. `loaders.ts` — `getSettings`, `getDivisions`, `getProjects`,
+  `getHomePage`, `getAboutPage`, `getTestimonials`, wrapped in React `cache()`
+  so a page's components each ask without re-querying. A missing singleton
+  throws with the fix in the message: the build fails rather than shipping a
+  blank footer.
+- `src/lib/links.ts` (`telLink`, `waLink`, `mapsUrl` derived from settings),
+  `src/lib/site-url.ts` (the origin — infrastructure, so env not CMS),
+  `src/lib/format.ts`.
+- Server components call the loaders directly. The client components that
+  need settings — `Header`, `MobileTabBar`, `EnquiryForm` — get only the
+  fields they use, as props from the layout or page.
+
+Content model — three lists, three single documents, one shared image type:
+
+- `project` — title, slug, division (reference), location, completedOn (a
+  date; shown as month + year), summary, `images[]`. The first image is the
+  lead. Every published project is a page, a card, and a candidate for the
+  homepage strip.
+- `division` — the three services: title, short, slug, order, blurb, intro,
+  items, image, tone (placeholder tint), `finishGroups` (swatches use
+  `@sanity/color-input`; GROQ reads `color.hex`), `specs`, `faqs`.
+- `testimonial` — quote, name, town, work, order.
+- `homePage` — three hero slots, before/after for the slider, the
+  where-we-work photo, and **`featuredProjects`**: references the owner picks
+  and orders, max six. Empty → the six newest. Nothing is uploaded twice.
+- `aboutPage` — owner portrait, `ownerStory[]`, statement, milestones,
+  principles.
+- `siteSettings` — name, owner, phone, WhatsApp, email, address, hours,
+  establishedYear, projectsCompleted, credential, serviceAreas, optional
+  `mapsUrl`.
+- `photo` — the image type every photograph field uses: hotspot on, **alt
+  text required**, and an async rule that rejects anything under 1200px on
+  the long side, quoting the dimensions.
+
+Singletons are pinned in `studio/structure.ts`, hidden from "create new" via
+`schema.templates`, and stripped of delete/duplicate via `document.actions`.
+
+**Photographs render as a plain `<img>` with a `srcset`, not `next/image`.**
+`Photo.tsx` takes a `SiteImage` or renders the `Placeholder` in the same
+footprint, so a photo arriving from the Studio changes no geometry.
+`src/sanity/image.ts` builds the URLs: widths 320–2000 capped at the original
+(never upscale), `auto=format`, quality 78, and with a `ratio` the CDN crops
+to it honouring the editor's hotspot. Width and height attributes reserve the
+box; the asset's LQIP paints underneath while it loads. Why not `next/image`:
+the CDN already resizes, a custom `loader` cannot be passed from a server
+component, and a plain `<img>` keeps photographs working on a host with no
+image service. `ComparisonSlider` is the exception — it keeps `next/image`
+for the local PNG fallbacks and sets `unoptimized` for CDN URLs.
+
+**Words stay in code.** Section headings, hero copy, the FAQ on /contact, the
+process illustrations and the logo were written for the layout. The Studio
+owns the facts (settings), the growing content (projects, testimonials) and
+every photograph.
+
+The old `src/data/*.ts` content files moved to `studio/seed/data/` and are now
+only the seed's input. `studio/seed/seed.ts` writes 18 documents with
+deterministic ids (`project-<slug>`, `division-<slug>`, the singleton names)
+and **refuses to run against a non-empty dataset** — after handover it would
+overwrite the owner's edits; `-- --force` is the deliberate override. The seed
+keeps **three projects per division on purpose**: the reference photos skewed
+furniture, and an unbalanced gallery is the most visible way that tilt gets
+back in. Once Nilesh is adding projects, balance is his. `nav.ts` stays in
+`src/data`: navigation is structure, not content.
+
+Commands from the root: `npm run studio` (local Studio, with the Vision GROQ
+console that is left out of the hosted build on purpose), `npm run
+studio:deploy`, `npm run seed`. Deploy and seed need a Developer-role token in
+`SANITY_AUTH_TOKEN`. The setup token was deleted on 6 Sep 2026 once the Studio
+and seed were in place; a future deploy or forced re-seed needs a fresh
+Developer-role token from sanity.io/manage → API → Tokens, used and then
+deleted the same way. `sanity.cli.ts` pins `studioHost` and the `appId` so
+deploys run unattended with `-y`.
+
+**Rebuild on publish is wired at deployment, not before.** Sanity → Manage →
+API → Webhooks: a POST on create/update/delete to the host's build hook URL
+(Cloudflare Pages, Netlify and Vercel all issue one). Full rebuild, one to two
+minutes; there is no on-demand revalidation route, so nothing depends on the
+host supporting ISR. Until that webhook exists a publish changes nothing on
+the live site.
+
+A renamed field has to change in three places — the schema, the GROQ
+projection and `types.ts` — because TypeScript cannot check a GROQ string.
 
 ## Stack
 
 Next.js 16.3 App Router (Turbopack) · React 19.2 · TypeScript · Tailwind v4.
 Every route is statically prerendered (`○ (Static)`) — keep it that way.
+
+Sanity v6 Studio in `studio/` — its own `package.json`, excluded from the root
+`tsconfig` and ESLint. The site itself depends only on `@sanity/client` and
+`@sanity/image-url`. Note `@sanity/icons` v5 exports each icon from its own
+subpath (`@sanity/icons/Cog`); a root import type-checks and then fails the
+Studio build.
 
 - `next lint` **does not exist** in Next 16. Use `npx eslint src --ext .ts,.tsx`.
 - Font is Archivo via `next/font/google`, self-hosted, variable.
@@ -454,9 +582,58 @@ a scroll fraction — the pin's height offsets the mapping:
 y = trackTop + pinHeight + i*stepHeight + within*stepHeight - 0.72*viewportHeight
 ```
 
+## SEO pass — scheduled 7 Sep 2026
+
+The site's job is to be found. The structural half is done: static HTML, real
+copy, canonicals, sitemap, robots, LocalBusiness + BreadcrumbList JSON-LD, alt
+text enforced in the Studio, no CLS, a page per project. This pass finishes the
+on-page and technical half before the first push to Cloudflare. The SEO friend
+does off-site; the job here is handing over a site that does not hold them back.
+
+In code, in this order:
+
+1. **Domain.** `siteUrl` fallback and `.env.example` → `https://aadienterprise.in`.
+2. **Titles and descriptions** rewritten to the commercial search terms —
+   "Aluminium Windows, Doors & Partitions in Himatnagar" rather than
+   "Aluminium & Glass in Himatnagar". Draft a page-by-page table first and get
+   Divy's approval so it does not clash with the friend's plan.
+3. **Open Graph image.** There is none. A branded card (logo, three divisions)
+   generated at build, until real photography replaces it.
+4. **Structured data.** `openingHoursSpecification` and `geo` on the business
+   record once hours and the pin are confirmed; a `Service` record on each
+   division page; `FAQPage` on the division and contact questions; per-project
+   `lastModified` in the sitemap from Sanity's `_updatedAt`.
+5. **Image weight — the biggest item.** The eight PNGs in `public/images/process`
+   are 1.6–1.9 MB each and the slider `priority`-preloads one below the fold.
+   Compress to WebP (roughly a tenth), serve them plain — Cloudflare has no
+   Next image optimiser, and the Sanity photographs already bypass it. Drop
+   the `priority`.
+6. **Completeness.** `lang="en-IN"`, web manifest and touch icons, and
+   env-gated hooks for Search Console verification and Cloudflare Web
+   Analytics so neither needs a code change later.
+7. **Audit.** Lighthouse at 1536×766 and 390×844, a Googlebot render (every
+   heading and all nine project links in the served HTML, nothing hidden),
+   scores recorded here.
+
+Not code — with owners:
+
+- **Google Business Profile** (Nilesh): claim and verify at the Durga Complex
+  address, categories, photos, hours, link to the site. Most of local ranking
+  lives here. Its URL then goes into Site settings → Google Maps link.
+- **Search Console** (Divy, once the domain is live): DNS verification at
+  Cloudflare, submit the sitemap.
+- **Citations** (SEO friend): JustDial, IndiaMART, Sulekha, Bing Places, with
+  name, address and phone identical everywhere.
+- **Content cadence** (Nilesh): a project a fortnight with the town in it.
+- **Backlinks** (SEO friend): a KDM dealer listing pointing at the site first.
+
+Not doing: town-by-town "doorway" pages. Thin pages per town are a penalty
+risk, and the gallery already ties real towns to real jobs.
+
 ## Open — needs the client
 
-In `src/data/site.ts`, everything marked `TBC`:
+In **Site settings** in the Studio (seeded from the old `site.ts`
+placeholders), everything that was marked `TBC`:
 
 - Real Google Maps pin for `mapsUrl` (ask him to drop a location and share the
   link). Once the Google Business Profile exists, point at the **listing**, not
@@ -473,33 +650,47 @@ In `src/data/site.ts`, everything marked `TBC`:
 Deployment is step 3, so none of this is urgent yet — but nothing here may be
 skipped when it is.
 
-- [ ] `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` set on the host (steps in
-      `.env.example`). Send a real test enquiry and confirm it arrives.
+- [ ] `BREVO_API_KEY`, `ENQUIRY_FROM` and `ENQUIRY_TO` set on the host (steps
+      in `.env.example`). Send a real test enquiry and confirm it arrives in
+      the business Gmail; have Nilesh mark the first one "not spam". Consider
+      regenerating the key first — the setup one was photographed.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
       robots.txt and the LocalBusiness JSON-LD all build off it.
-- [ ] Every `specs` value in `services.ts` confirmed by Nilesh. They are my
-      drafts. Publishing a wrong section size or lead time is worse than
-      publishing none.
-- [ ] All `TBC` values in `site.ts` confirmed.
-- [ ] **`story.ts` milestone years confirmed.** The five dates on the About
-      page are inferred from `establishedYear` and are invented. A wrong year
+- [ ] Every `specs` value on the three **Division** documents confirmed by
+      Nilesh. They are my drafts. Publishing a wrong section size or lead time
+      is worse than publishing none.
+- [ ] All `TBC` values in **Site settings** confirmed.
+- [ ] **About page milestone years confirmed** (Studio → About page). The
+      five dates are inferred from `establishedYear` and are invented. A wrong year
       on an About page is exactly the kind of thing a local customer notices.
       Nothing there is written as a quotation in Nilesh's mouth, and it should
       stay that way — the statement band is an unattributed principle on
       purpose.
 - [ ] Real testimonials replacing the placeholder quotes.
-- [ ] `mapsUrl` pointed at the Google Business Profile listing.
+- [ ] **Google Maps link** in Site settings pointed at the Google Business
+      Profile listing.
+- [ ] Sanity webhook (Manage → API → Webhooks) pointed at the host's build
+      hook, then publish a test edit and watch the site rebuild.
+- [x] The `setup` Developer token deleted in Manage → API → Tokens (6 Sep
+      2026). Nothing live uses one.
+- [ ] Nilesh invited to the Sanity project as **Editor** (Manage → Members),
+      and shown the Studio once: Projects → + → fill → upload → Publish.
 
 ## Open — needs a decision
 
-- **The real domain.** `site.url` in `src/data/site.ts` is a guess. Canonical
-  URLs, the sitemap, robots.txt and the LocalBusiness JSON-LD all build off
-  it, so it has to be right before launch. Overridable at build time with
-  `NEXT_PUBLIC_SITE_URL`.
-- **Hosting.** Vercel Hobby's terms don't cover commercial use, so it's
-  Cloudflare Pages, Netlify, or Vercel Pro. Not decided. Note the site now has
-  one server function (`/api/enquiry`), so a pure static-file host is out —
-  all three candidates support it on their free tiers.
+- **The real domain — decided 6 Sep: aadienterprise.in**, to be bought. Until
+  the SEO pass switches it, `siteUrl` in `src/lib/site-url.ts` still falls back
+  to the old `.com` guess. Canonical URLs, the sitemap, robots.txt and the
+  LocalBusiness JSON-LD all build off it. Overridable at build time with
+  `NEXT_PUBLIC_SITE_URL`, which is what the host will set.
+- **Hosting — decided 6 Sep: Cloudflare.** Two things to know. The old
+  Cloudflare Pages adapter for Next is frozen and does not support Next 16;
+  the supported path is Cloudflare's OpenNext adapter, deploying to Workers
+  with static assets — same free tier, same push-to-deploy, and it runs the
+  one server function (`/api/enquiry`). And there is no Next image optimiser
+  there, so the local PNGs must be pre-compressed and served plain (the SEO
+  pass does this; the Sanity photographs already bypass it). Verify both
+  against Cloudflare's current docs at deploy time — this area changes often.
 - **First-load JS is 173 KB gzipped**, of which ~150 KB is the React 19 +
   App Router runtime. I told the client to expect under 100 KB earlier and that
   was wrong. Worth flagging: the original reason for choosing Next was an
@@ -510,7 +701,12 @@ skipped when it is.
 
 ## Footer map
 
-`FooterMap.tsx` is a facade — inline SVG, no network request, no third party,
+As of Divy's 6 Sep 2026 frontend commit — the developer's own change, not the
+client's — `FooterMap.tsx` is a lazy-loaded Google Maps **iframe** fed by
+`mapsEmbedUrl(settings)`. The reasoning below is the
+standing recommendation, not the current state.
+
+`FooterMap.tsx` was a facade — inline SVG, no network request, no third party,
 opens real Google Maps directions on tap. A live iframe would cost 500 KB+ of
 tiles and third-party script on every page and set Google cookies. Keep it a
 facade.

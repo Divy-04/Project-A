@@ -7,15 +7,19 @@ import { Button } from "@/components/Button";
 import { CtaBand } from "@/components/CtaBand";
 import { Faqs } from "@/components/Faqs";
 import { PageHeader } from "@/components/PageHeader";
-import { Placeholder, type Tone } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHead } from "@/components/SectionHead";
 import { SpecList } from "@/components/SpecList";
 import { Swatches } from "@/components/Swatches";
 import { ArrowIcon, CheckIcon, PhoneIcon } from "@/components/icons";
-import { projectsInCategory, type Project } from "@/data/projects";
-import { serviceBySlug, services } from "@/data/services";
-import { site, telLink } from "@/data/site";
+import { telLink } from "@/lib/links";
+import {
+  getDivision,
+  getDivisions,
+  getProjectsInDivision,
+  getSettings,
+} from "@/sanity/loaders";
 
 /**
  * One page per division.
@@ -30,15 +34,16 @@ import { site, telLink } from "@/data/site";
  * supporting, not load-bearing. That was the fix for these pages reading as a
  * grey box and a bulleted list.
  */
-export function generateStaticParams() {
-  return services.map((service) => ({ slug: service.slug }));
+export async function generateStaticParams() {
+  const divisions = await getDivisions();
+  return divisions.map((division) => ({ slug: division.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/services/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const service = serviceBySlug(slug);
+  const [service, site] = await Promise.all([getDivision(slug), getSettings()]);
   if (!service) return {};
 
   return {
@@ -52,11 +57,15 @@ export default async function ServicePage({
   params,
 }: PageProps<"/services/[slug]">) {
   const { slug } = await params;
-  const service = serviceBySlug(slug);
+  const [service, divisions, site] = await Promise.all([
+    getDivision(slug),
+    getDivisions(),
+    getSettings(),
+  ]);
   if (!service) notFound();
 
-  const work = projectsInCategory(service.slug as Project["category"]);
-  const others = services.filter((s) => s.slug !== service.slug);
+  const work = await getProjectsInDivision(service.slug);
+  const others = divisions.filter((s) => s.slug !== service.slug);
 
   return (
     <>
@@ -65,7 +74,7 @@ export default async function ServicePage({
         title={`${service.title} in ${site.address.city}`}
         intro={service.blurb}
         aside={
-          <Button href={telLink} size="lg">
+          <Button href={telLink(site)} size="lg">
             <PhoneIcon className="h-4 w-4" />
             Call {site.phoneDisplay}
           </Button>
@@ -127,11 +136,13 @@ export default async function ServicePage({
 
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-28">
-              <Placeholder
+              <Photo
+                image={service.image}
+                ratio="4/5"
+                sizes="(min-width: 1024px) 38vw, 92vw"
                 label={service.title}
                 sublabel="Division photograph · 4:5"
-                tone={service.tone as Tone}
-                ratio="4/5"
+                tone={service.tone}
               />
             </div>
           </div>
@@ -140,33 +151,37 @@ export default async function ServicePage({
 
       {/* Finishes. The most useful thing on the page while there are no
           photographs, and it stays useful once there are. */}
-      <section className="border-y border-line bg-surface py-20 lg:py-24">
-        <div className="shell">
-          <SectionHead
-            label="Finishes"
-            title="Choose the finish, not just the shape."
-            intro="Colours here are indicative — every one of them looks different on a screen than it does in your hand, so ask to see a sample before you decide."
-          />
-          <div className="mt-14">
-            <Swatches groups={service.finishGroups} />
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-ground py-20 lg:py-24">
-        <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
+      {service.finishGroups.length > 0 && (
+        <section className="border-y border-line bg-surface py-20 lg:py-24">
+          <div className="shell">
             <SectionHead
-              label="Specification"
-              title="What the quote covers."
-              intro="Written down so you can hold our figure against anyone else's and know you are comparing the same thing."
+              label="Finishes"
+              title="Choose the finish, not just the shape."
+              intro="Colours here are indicative — every one of them looks different on a screen than it does in your hand, so ask to see a sample before you decide."
             />
+            <div className="mt-14">
+              <Swatches groups={service.finishGroups} />
+            </div>
           </div>
-          <div className="lg:col-span-7">
-            <SpecList specs={service.specs} />
+        </section>
+      )}
+
+      {service.specs.length > 0 && (
+        <section className="bg-ground py-20 lg:py-24">
+          <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <SectionHead
+                label="Specification"
+                title="What the quote covers."
+                intro="Written down so you can hold our figure against anyone else's and know you are comparing the same thing."
+              />
+            </div>
+            <div className="lg:col-span-7">
+              <SpecList specs={service.specs} />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {work.length > 0 && (
         <section className="border-y border-line bg-surface py-20 lg:py-24">
@@ -185,26 +200,28 @@ export default async function ServicePage({
             />
             <div className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {work.map((project) => (
-                <ProjectCard key={project.slug} project={project} />
+                <ProjectCard key={project._id} project={project} />
               ))}
             </div>
           </div>
         </section>
       )}
 
-      <section className="bg-ground py-20 lg:py-24">
-        <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <SectionHead
-              label="Questions"
-              title={`What we get asked about ${service.short}.`}
-            />
+      {service.faqs.length > 0 && (
+        <section className="bg-ground py-20 lg:py-24">
+          <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <SectionHead
+                label="Questions"
+                title={`What we get asked about ${service.short}.`}
+              />
+            </div>
+            <div className="lg:col-span-7">
+              <Faqs faqs={service.faqs} />
+            </div>
           </div>
-          <div className="lg:col-span-7">
-            <Faqs faqs={service.faqs} />
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="border-t border-line bg-surface py-20 lg:py-24">
         <div className="shell">

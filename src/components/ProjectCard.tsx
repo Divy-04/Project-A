@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { Placeholder, type Tone } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { ArrowIcon } from "@/components/icons";
-import {
-  formatCompleted,
-  toneForCategory,
-  type Project,
-} from "@/data/projects";
+import { formatCompleted } from "@/lib/format";
+import type { Project } from "@/sanity/types";
 
 /**
  * One project in a grid or a rail. Used on the homepage, the gallery and the
@@ -23,6 +20,9 @@ import {
  *   variant that survives being pulled out of a page and put on a rail: on a
  *   phone the cards slide horizontally one at a time, and a card floating on
  *   its own needs an edge and enough detail to be worth stopping on.
+ *
+ * The photograph is the project's first image; until the owner uploads one
+ * the slot shows the hatched placeholder in the division's tone.
  */
 export function ProjectCard({
   project,
@@ -31,7 +31,9 @@ export function ProjectCard({
   project: Project;
   variant?: "plain" | "card";
 }) {
-  const tone = toneForCategory(project.category) as Tone;
+  const lead = project.images[0];
+  const count = project.images.length;
+  const { tone, title: division } = project.division;
 
   if (variant === "card") {
     return (
@@ -41,19 +43,21 @@ export function ProjectCard({
           className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors hover:border-line-strong"
         >
           <div className="relative overflow-hidden">
-            <Placeholder
-              label={`${project.photoCount} photos`}
-              tone={tone}
+            <Photo
+              image={lead}
               ratio="4/3"
+              sizes="(min-width: 1024px) 30vw, 19rem"
               rounded="rounded-none"
               className="transition-transform duration-500 group-hover:scale-[1.03]"
+              label={count ? `${count} photos` : division}
+              tone={tone}
             />
 
             {/* The label rides on the image so the body below can open with
                 the title. On a rail the division is the first thing you need
                 to read — it is what tells you the filter did something. */}
             <span className="eyebrow absolute top-3 left-3 rounded-full bg-surface/95 px-2.5 py-1.5 text-brand-ink backdrop-blur-sm">
-              {project.categoryLabel}
+              {division}
             </span>
           </div>
 
@@ -82,17 +86,19 @@ export function ProjectCard({
     <article className="group">
       <Link href={`/gallery/${project.slug}`} className="block">
         <div className="overflow-hidden">
-          <Placeholder
-            label={project.categoryLabel}
-            sublabel={`${project.photoCount} photos · 4:3`}
-            tone={tone}
+          <Photo
+            image={lead}
             ratio="4/3"
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
             className="transition-transform duration-500 group-hover:scale-[1.02]"
+            label={division}
+            sublabel={count ? `${count} photos · 4:3` : "4:3"}
+            tone={tone}
           />
         </div>
 
         <div className="mt-5">
-          <p className="eyebrow text-brand-ink">{project.categoryLabel}</p>
+          <p className="eyebrow text-brand-ink">{division}</p>
           <h3 className="mt-2.5 text-lg font-bold tracking-[-0.02em] transition-colors group-hover:text-brand">
             {project.title}
           </h3>

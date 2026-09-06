@@ -5,28 +5,29 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { CtaBand } from "@/components/CtaBand";
 import { PageHeader } from "@/components/PageHeader";
-import { Placeholder, type Tone } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHead } from "@/components/SectionHead";
 import { ArrowIcon, PhoneIcon } from "@/components/icons";
+import { formatCompleted } from "@/lib/format";
+import { telLink } from "@/lib/links";
 import {
-  formatCompleted,
-  projectBySlug,
-  projects,
-  toneForCategory,
-} from "@/data/projects";
-import { services } from "@/data/services";
-import { site, telLink } from "@/data/site";
+  getDivision,
+  getProject,
+  getProjects,
+  getSettings,
+} from "@/sanity/loaders";
 
 /**
  * One page per completed job.
  *
- * This is the part of the site that grows: every project the owner uploads
- * becomes another indexable page carrying a real town name and a real trade
- * term. Six placeholder records today, statically prerendered — the same
- * generateStaticParams reads from Sanity later without the page changing.
+ * This is the part of the site that grows: every project the owner publishes
+ * in the Studio becomes another indexable page carrying a real town name and
+ * a real trade term. All of them are prerendered — `generateStaticParams`
+ * reads the list from Sanity at build time, and a publish triggers a rebuild.
  */
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const projects = await getProjects();
   return projects.map((project) => ({ slug: project.slug }));
 }
 
@@ -34,7 +35,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/gallery/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const project = projectBySlug(slug);
+  const project = await getProject(slug);
   if (!project) return {};
 
   return {
@@ -48,35 +49,45 @@ export default async function ProjectPage({
   params,
 }: PageProps<"/gallery/[slug]">) {
   const { slug } = await params;
-  const project = projectBySlug(slug);
+  const [project, projects, site] = await Promise.all([
+    getProject(slug),
+    getProjects(),
+    getSettings(),
+  ]);
   if (!project) notFound();
 
-  const service = services.find((s) => s.slug === project.category);
-  const tone = toneForCategory(project.category) as Tone;
+  const division = await getDivision(project.division.slug);
+  const tone = project.division.tone;
 
   const index = projects.findIndex((p) => p.slug === project.slug);
   const previous = projects[index - 1];
   const next = projects[index + 1];
 
   const related = projects
-    .filter((p) => p.category === project.category && p.slug !== project.slug)
+    .filter(
+      (p) => p.division.slug === project.division.slug && p.slug !== project.slug,
+    )
     .slice(0, 3);
 
+  const [lead, ...details] = project.images;
+
   const facts = [
-    { label: "Division", value: project.categoryLabel },
+    { label: "Division", value: project.division.title },
     { label: "Location", value: project.location },
     { label: "Completed", value: formatCompleted(project.completedOn) },
-    { label: "Photographs", value: `${project.photoCount}` },
+    ...(project.images.length > 0
+      ? [{ label: "Photographs", value: String(project.images.length) }]
+      : []),
   ];
 
   return (
     <>
       <PageHeader
-        eyebrow={project.categoryLabel}
+        eyebrow={project.division.title}
         title={project.title}
         intro={project.summary}
         aside={
-          <Button href={telLink} size="lg">
+          <Button href={telLink(site)} size="lg">
             <PhoneIcon className="h-4 w-4" />
             Ask about a job like this
           </Button>
@@ -94,31 +105,38 @@ export default async function ProjectPage({
           anything — the lead shot is 3:2 and the set below it 4:3. */}
       <section className="bg-ground py-14 lg:py-20">
         <div className="shell">
-          <Placeholder
+          <Photo
+            image={lead}
+            ratio="3/2"
+            priority
+            sizes="(min-width: 1280px) 1184px, 92vw"
             label={project.title}
             sublabel="Lead photograph · 3:2"
             tone={tone}
-            ratio="3/2"
           />
 
-          {project.photoCount > 1 && (
+          {details.length > 0 && (
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
-              {Array.from({ length: project.photoCount - 1 }, (_, i) => (
-                <Placeholder
-                  key={i}
+              {details.map((image, i) => (
+                <Photo
+                  key={image.asset._id + i}
+                  image={image}
+                  ratio="4/3"
+                  sizes="(min-width: 640px) 30vw, 92vw"
                   label={`Detail ${i + 1}`}
                   sublabel="4:3"
                   tone={tone}
-                  ratio="4/3"
                 />
               ))}
             </div>
           )}
 
-          <p className="mt-5 text-[0.8125rem] text-ink-3">
-            Photographs to be supplied by {site.owner}. These slots are sized
-            and positioned as they will appear.
-          </p>
+          {!lead && (
+            <p className="mt-5 text-[0.8125rem] text-ink-3">
+              Photographs to be supplied by {site.owner}. This slot is sized
+              and positioned as it will appear.
+            </p>
+          )}
         </div>
       </section>
 
@@ -136,13 +154,13 @@ export default async function ProjectPage({
               through.
             </p>
 
-            {service && (
+            {division && (
               <>
                 <p className="eyebrow mt-10 text-ink-3">
                   Related to this division
                 </p>
                 <ul className="mt-4 flex flex-wrap gap-2">
-                  {service.items.map((item) => (
+                  {division.items.map((item) => (
                     <li
                       key={item}
                       className="rounded-sm border border-line bg-ground px-2.5 py-1 text-xs font-medium text-ink-2"
@@ -153,10 +171,10 @@ export default async function ProjectPage({
                 </ul>
 
                 <Link
-                  href={`/services/${service.slug}`}
+                  href={`/services/${division.slug}`}
                   className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-ink transition-colors hover:text-brand"
                 >
-                  More {service.short} work
+                  More {division.short} work
                   <ArrowIcon className="h-4 w-4" />
                 </Link>
               </>
@@ -186,7 +204,7 @@ export default async function ProjectPage({
           <div className="shell">
             <SectionHead
               label="More like this"
-              title={`More ${project.categoryLabel} work.`}
+              title={`More ${project.division.title} work.`}
               align="between"
               action={
                 <Button href="/gallery" variant="outline">
@@ -197,7 +215,7 @@ export default async function ProjectPage({
             />
             <div className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p) => (
-                <ProjectCard key={p.slug} project={p} />
+                <ProjectCard key={p._id} project={p} />
               ))}
             </div>
           </div>

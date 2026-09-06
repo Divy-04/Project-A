@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowIcon } from "@/components/icons";
-import { formatCompleted, toneForCategory, type Project } from "@/data/projects";
+import { formatCompleted } from "@/lib/format";
+import type { Project } from "@/sanity/types";
 
 const swatch: Record<string, string> = {
   cool: "#dfe3e6",
@@ -33,7 +34,7 @@ export function ProjectIndex({ projects }: { projects: Project[] }) {
             <span className="index-title col-start-2 flex items-baseline gap-3 font-bold tracking-[-0.02em] sm:text-[1.0625rem]">
               <span
                 aria-hidden="true"
-                style={{ background: swatch[toneForCategory(project.category)] }}
+                style={{ background: swatch[project.division.tone] }}
                 className="h-2.5 w-2.5 shrink-0 translate-y-px rounded-full ring-1 ring-line-strong ring-inset"
               />
               {project.title}
@@ -44,7 +45,7 @@ export function ProjectIndex({ projects }: { projects: Project[] }) {
             </span>
 
             <span className="col-span-2 col-start-2 text-[0.8125rem] text-ink-3 sm:col-span-1 sm:col-start-4 sm:row-start-1 sm:whitespace-nowrap">
-              {project.categoryLabel}
+              {project.division.title}
               <span className="sm:hidden"> · {formatCompleted(project.completedOn)}</span>
             </span>
 

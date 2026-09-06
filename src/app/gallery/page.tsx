@@ -3,15 +3,16 @@ import { ElevationBackdrop } from "@/components/Backdrop";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CtaBand } from "@/components/CtaBand";
 import { GalleryBrowser } from "@/components/GalleryBrowser";
-import { projects } from "@/data/projects";
-import { services } from "@/data/services";
-import { site } from "@/data/site";
+import { getDivisions, getProjects, getSettings } from "@/sanity/loaders";
 
-export const metadata: Metadata = {
-  title: "Our Work",
-  description: `Completed aluminium, glass, PVC profile and furniture projects across ${site.address.city} and ${site.address.district}. Photographs, location and what each job involved.`,
-  alternates: { canonical: "/gallery" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSettings();
+  return {
+    title: "Our Work",
+    description: `Completed aluminium, glass, PVC profile and furniture projects across ${site.address.city} and ${site.address.district}. Photographs, location and what each job involved.`,
+    alternates: { canonical: "/gallery" },
+  };
+}
 
 /**
  * The work index.
@@ -24,12 +25,20 @@ export const metadata: Metadata = {
  * The browser is a client component, but it renders every project unfiltered
  * on the server: nothing is hidden until someone clicks. See GalleryBrowser.
  */
-export default function GalleryPage() {
-  const towns = new Set(projects.map((p) => p.location.split(",").pop()!.trim()));
+export default async function GalleryPage() {
+  const [site, divisions, projects] = await Promise.all([
+    getSettings(),
+    getDivisions(),
+    getProjects(),
+  ]);
+
+  const towns = new Set(
+    projects.map((p) => p.location.split(",").pop()!.trim()),
+  );
 
   const facts = [
     ["Projects", String(projects.length)],
-    ["Divisions", String(services.length)],
+    ["Divisions", String(divisions.length)],
     ["Towns", String(towns.size)],
     ["Based in", site.address.city],
   ];
@@ -71,7 +80,7 @@ export default function GalleryPage() {
 
       <GalleryBrowser
         projects={projects}
-        divisions={services.map(({ slug, title, short }) => ({
+        divisions={divisions.map(({ slug, title, short }) => ({
           slug,
           title,
           short,

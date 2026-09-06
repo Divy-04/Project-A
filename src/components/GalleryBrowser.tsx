@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectIndex } from "./ProjectIndex";
 import { GridIcon, ListIcon } from "./icons";
-import type { Project } from "@/data/projects";
+import type { Project } from "@/sanity/types";
 
 type Division = { slug: string; title: string; short: string };
 
@@ -84,7 +84,8 @@ export function GalleryBrowser({
   }
 
   const counts = new Map<string, number>();
-  for (const p of projects) counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
+  for (const p of projects)
+    counts.set(p.division.slug, (counts.get(p.division.slug) ?? 0) + 1);
 
   const filters = [
     { slug: "all", title: "All work", count: projects.length },
@@ -98,7 +99,7 @@ export function GalleryBrowser({
   const shown =
     division === "all"
       ? projects
-      : projects.filter((p) => p.category === division);
+      : projects.filter((p) => p.division.slug === division);
 
   const active = filters.find((f) => f.slug === division);
 

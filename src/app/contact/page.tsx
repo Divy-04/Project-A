@@ -13,48 +13,54 @@ import {
   PinIcon,
   WhatsAppIcon,
 } from "@/components/icons";
-import { services } from "@/data/services";
-import { mapsUrl, site, telLink, waLink } from "@/data/site";
+import { mapsUrl, telLink, waLink } from "@/lib/links";
+import { getDivisions, getSettings } from "@/sanity/loaders";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Call ${site.phoneDisplay} or message on WhatsApp. ${site.name}, ${site.address.line1}, ${site.address.city}, ${site.address.district}. Free site visit and measurement.`,
-  alternates: { canonical: "/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSettings();
+  return {
+    title: "Contact",
+    description: `Call ${site.phoneDisplay} or message on WhatsApp. ${site.name}, ${site.address.line1}, ${site.address.city}, ${site.address.district}. Free site visit and measurement.`,
+    alternates: { canonical: "/contact" },
+  };
+}
 
 /**
  * Call and WhatsApp stay the primary actions — around here that is how the
  * enquiry actually arrives, and both work with no JavaScript. The form is the
- * third option, for the people who will not ring; it relays to Telegram via
- * /api/enquiry so the bot token never reaches the browser.
+ * third option, for the people who will not ring; it emails the owner via
+ * /api/enquiry so the Brevo key never reaches the browser.
  */
-const faqs = [
-  {
-    q: "Do you charge for a site visit?",
-    a: "No. We come out, measure the opening and give you a figure. There is no charge for the visit and no obligation afterwards.",
-  },
-  {
-    q: "How far do you travel?",
-    a: `${site.serviceAreas.join(", ")} and the villages between them. If you are nearby and not on that list, call and ask — it is usually a yes.`,
-  },
-  {
-    q: "How long does a job take?",
-    a: "It depends entirely on the size and the material, which is why we would rather measure than guess. We will give you a realistic date at the time of quoting, not an optimistic one.",
-  },
-  {
-    q: "Can I get a rough idea before you visit?",
-    a: "Send photographs on WhatsApp with an approximate width and height and we can give you a ballpark. Anything firm still needs a measurement.",
-  },
-  {
-    q: "Do you handle repairs and alterations?",
-    a: "Yes — re-glazing, shutter and roller adjustments, replacing a damaged section. Call and describe it, or send a photograph.",
-  },
-];
+export default async function ContactPage() {
+  const [site, divisions] = await Promise.all([getSettings(), getDivisions()]);
+  const tel = telLink(site);
 
-export default function ContactPage() {
+  const faqs = [
+    {
+      q: "Do you charge for a site visit?",
+      a: "No. We come out, measure the opening and give you a figure. There is no charge for the visit and no obligation afterwards.",
+    },
+    {
+      q: "How far do you travel?",
+      a: `${site.serviceAreas.join(", ")} and the villages between them. If you are nearby and not on that list, call and ask — it is usually a yes.`,
+    },
+    {
+      q: "How long does a job take?",
+      a: "It depends entirely on the size and the material, which is why we would rather measure than guess. We will give you a realistic date at the time of quoting, not an optimistic one.",
+    },
+    {
+      q: "Can I get a rough idea before you visit?",
+      a: "Send photographs on WhatsApp with an approximate width and height and we can give you a ballpark. Anything firm still needs a measurement.",
+    },
+    {
+      q: "Do you handle repairs and alterations?",
+      a: "Yes — re-glazing, shutter and roller adjustments, replacing a damaged section. Call and describe it, or send a photograph.",
+    },
+  ];
+
   const channels = [
     {
-      href: telLink,
+      href: tel,
       icon: <PhoneIcon className="h-5 w-5" />,
       label: "Call",
       value: site.phoneDisplay,
@@ -63,6 +69,7 @@ export default function ContactPage() {
     },
     {
       href: waLink(
+        site,
         `Hello ${site.owner}, I found your website and would like a quote for `,
       ),
       icon: <WhatsAppIcon className="h-5 w-5" />,
@@ -154,7 +161,15 @@ export default function ContactPage() {
             />
           </div>
           <div className="lg:col-span-7">
-            <EnquiryForm />
+            <EnquiryForm
+              divisions={divisions.map(({ slug, title }) => ({ slug, title }))}
+              settings={{
+                owner: site.owner,
+                phone: site.phone,
+                phoneDisplay: site.phoneDisplay,
+                whatsapp: site.whatsapp,
+              }}
+            />
           </div>
         </div>
       </section>
@@ -164,7 +179,7 @@ export default function ContactPage() {
           <div className="lg:col-span-6">
             <SectionHead
               label="Visit the workshop"
-              title="Durga Complex, Himatnagar."
+              title={`${site.address.line1.split(", ").pop()}, ${site.address.city}.`}
               intro="Come and see the sections and the finishes in person — it is a lot easier to choose a profile with it in your hand than from a photograph."
             />
 
@@ -184,7 +199,7 @@ export default function ContactPage() {
               <p className="flex items-center gap-3.5">
                 <PhoneIcon className="h-4 w-4 shrink-0 text-brand" />
                 <a
-                  href={telLink}
+                  href={tel}
                   className="font-semibold text-ink transition-colors hover:text-brand"
                 >
                   {site.phoneDisplay}
@@ -206,7 +221,7 @@ export default function ContactPage() {
             </address>
 
             <a
-              href={mapsUrl}
+              href={mapsUrl(site)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-ink transition-colors hover:text-brand"
@@ -236,10 +251,11 @@ export default function ContactPage() {
 
           <div className="lg:col-span-7">
             <ul className="divide-y divide-line border-y border-line">
-              {services.map((service) => (
+              {divisions.map((service) => (
                 <li key={service.slug}>
                   <a
                     href={waLink(
+                      site,
                       `Hello ${site.owner}, I found your website. I would like a quote for ${service.title} — `,
                     )}
                     target="_blank"

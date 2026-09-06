@@ -2,9 +2,9 @@ import Link from "next/link";
 import { WordmarkStacked } from "./Wordmark";
 import { FooterMap } from "./FooterMap";
 import { ClockIcon, MailIcon, PhoneIcon, PinIcon } from "./icons";
-import { site, telLink } from "@/data/site";
-import { services } from "@/data/services";
 import { nav } from "@/data/nav";
+import { telLink } from "@/lib/links";
+import { getDivisions, getSettings } from "@/sanity/loaders";
 
 /**
  * Three bands: a masthead, a row of columns, and the legal line.
@@ -22,7 +22,8 @@ import { nav } from "@/data/nav";
 
 const heading = "eyebrow text-white/50";
 
-export function Footer() {
+export async function Footer() {
+  const [site, divisions] = await Promise.all([getSettings(), getDivisions()]);
   const year = 2026;
 
   return (
@@ -54,7 +55,7 @@ export function Footer() {
               </p>
               <p className="flex items-center gap-3">
                 <PhoneIcon className="h-4 w-4 shrink-0 text-brand" />
-                <a href={telLink} className="hover:text-white">
+                <a href={telLink(site)} className="hover:text-white">
                   {site.phoneDisplay}
                 </a>
               </p>
@@ -77,7 +78,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h2 className={heading}>Services</h2>
             <ul className="mt-5 space-y-3 text-sm">
-              {services.map((s) => (
+              {divisions.map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/services/${s.slug}`}

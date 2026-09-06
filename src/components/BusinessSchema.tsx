@@ -1,5 +1,5 @@
-import { services } from "@/data/services";
-import { site } from "@/data/site";
+import { siteUrl } from "@/lib/site-url";
+import { getDivisions, getSettings } from "@/sanity/loaders";
 
 /**
  * LocalBusiness structured data, emitted once site-wide.
@@ -9,18 +9,20 @@ import { site } from "@/data/site";
  * and to the map pack, which for a single-location trade business is most of
  * the local-search battle.
  *
- * Two things to fix before launch, both marked TBC in site.ts: `site.url` has
- * to be the real domain, and `hasMap`/`areaServed` are only as accurate as the
- * values in there. Once the Google Business Profile exists, add its URL to
- * `sameAs` — that association is a direct ranking signal.
+ * Two things to fix before launch: `siteUrl` has to be the real domain, and
+ * `areaServed` is only as accurate as the towns in Site settings. Once the
+ * Google Business Profile exists, add its URL to `sameAs` — that association
+ * is a direct ranking signal.
  */
-export function BusinessSchema() {
+export async function BusinessSchema() {
+  const [site, divisions] = await Promise.all([getSettings(), getDivisions()]);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "HomeAndConstructionBusiness",
-    "@id": `${site.url}/#business`,
+    "@id": `${siteUrl}/#business`,
     name: site.name,
-    url: site.url,
+    url: siteUrl,
     telephone: site.phone,
     email: site.email,
     founder: { "@type": "Person", name: site.owner },
@@ -37,14 +39,14 @@ export function BusinessSchema() {
       "@type": "City",
       name: town,
     })),
-    knowsAbout: services.flatMap((service) => service.items),
-    makesOffer: services.map((service) => ({
+    knowsAbout: divisions.flatMap((division) => division.items),
+    makesOffer: divisions.map((division) => ({
       "@type": "Offer",
       itemOffered: {
         "@type": "Service",
-        name: service.title,
-        description: service.blurb,
-        url: `${site.url}/services/${service.slug}`,
+        name: division.title,
+        description: division.blurb,
+        url: `${siteUrl}/services/${division.slug}`,
       },
     })),
   };

@@ -1,9 +1,12 @@
 import { Button } from "@/components/Button";
 import { MarkWatermark } from "@/components/Backdrop";
 import { PhoneIcon, WhatsAppIcon } from "@/components/icons";
-import { site, telLink, waLink } from "@/data/site";
+import { telLink, waLink } from "@/lib/links";
+import { getSettings } from "@/sanity/loaders";
 
-export function CtaBand() {
+export async function CtaBand() {
+  const site = await getSettings();
+
   return (
     <section className="grain relative overflow-hidden bg-brand">
       <MarkWatermark className="-top-16 -right-16 h-[26rem] w-[26rem] text-white/[0.07]" />
@@ -21,12 +24,13 @@ export function CtaBand() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0 lg:flex-col xl:flex-row">
-          <Button href={telLink} variant="solidLight" size="lg">
+          <Button href={telLink(site)} variant="solidLight" size="lg">
             <PhoneIcon className="h-4 w-4" />
             Give us a call
           </Button>
           <Button
             href={waLink(
+              site,
               `Hello ${site.owner}, I found your website and would like a quote for `,
             )}
             variant="ghostLight"

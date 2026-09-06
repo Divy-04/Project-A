@@ -1,4 +1,4 @@
-import type { Faq } from "@/data/services";
+import type { Faq } from "@/sanity/types";
 
 /**
  * FAQ accordion built on native <details>/<summary>.

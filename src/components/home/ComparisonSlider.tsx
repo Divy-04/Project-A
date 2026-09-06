@@ -12,18 +12,29 @@ export function ComparisonSlider({
   alt?: string;
 }) {
   const [position, setPosition] = useState(50);
+  // Sanity CDN images arrive already resized and encoded; only the local
+  // fallbacks in /public go through the Next image optimiser.
+  const remote = (src: string) => src.startsWith("http");
 
   return (
     <section className="shell my-20">
       <div
         className="relative mx-auto aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-xl border border-line bg-ink shadow-[0_18px_45px_rgba(20,20,20,0.12)]"
       >
-        <Image src={afterSrc} alt={`${alt}, after`} fill className="object-cover" priority />
+        <Image
+          src={afterSrc}
+          alt={`${alt}, after`}
+          fill
+          className="object-cover"
+          priority
+          unoptimized={remote(afterSrc)}
+        />
         <Image
           src={beforeSrc}
           alt={`${alt}, before`}
           fill
           className="object-cover"
+          unoptimized={remote(beforeSrc)}
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         />
         <div

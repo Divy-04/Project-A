@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { Placeholder, type Tone } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { SectionHead } from "@/components/SectionHead";
 import { ArrowIcon } from "@/components/icons";
-import { services } from "@/data/services";
+import { getDivisions } from "@/sanity/loaders";
 
-export function Services() {
+export async function Services() {
+  const divisions = await getDivisions();
+
   return (
     <section id="services" className="scroll-mt-24 bg-ground py-20 lg:py-28">
       <div className="shell">
@@ -15,14 +17,16 @@ export function Services() {
         />
 
         <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
-          {services.map((service, i) => (
+          {divisions.map((service, i) => (
             <article key={service.slug} className="group flex flex-col">
               <Link href={`/services/${service.slug}`} className="block">
-                <Placeholder
+                <Photo
+                  image={service.image}
+                  ratio="4/3"
+                  sizes="(min-width: 768px) 30vw, 92vw"
                   label={service.short}
                   sublabel="4:3"
-                  tone={service.tone as Tone}
-                  ratio="4/3"
+                  tone={service.tone}
                 />
               </Link>
 

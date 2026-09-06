@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/data/site";
+import { siteUrl } from "@/lib/site-url";
 
 export type Crumb = { href: string; label: string };
 
@@ -22,7 +22,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
       "@type": "ListItem",
       position: i + 1,
       name: c.label,
-      item: `${site.url}${c.href === "/" ? "" : c.href}`,
+      item: `${siteUrl}${c.href === "/" ? "" : c.href}`,
     })),
   };
 

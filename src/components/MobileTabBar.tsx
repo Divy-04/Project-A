@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { nav } from "@/data/nav";
-import { site, waLink } from "@/data/site";
+import { waLink } from "@/lib/links";
+import type { SiteSettings } from "@/sanity/types";
 import {
   ChatIcon,
   HomeIcon,
@@ -45,7 +46,11 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function MobileTabBar() {
+export function MobileTabBar({
+  settings,
+}: {
+  settings: Pick<SiteSettings, "owner" | "whatsapp">;
+}) {
   const pathname = usePathname();
 
   const tabs = nav.map((item) => {
@@ -89,7 +94,8 @@ export function MobileTabBar() {
         <li>
           <a
             href={waLink(
-              `Hello ${site.owner}, I found your website and would like a quote for `,
+              settings,
+              `Hello ${settings.owner}, I found your website and would like a quote for `,
             )}
             target="_blank"
             rel="noopener noreferrer"

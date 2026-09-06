@@ -1,21 +1,12 @@
 /**
- * Business-wide settings.
- *
- * This mirrors the future Sanity `siteSettings` singleton one-for-one, so
- * wiring the CMS later is a swap, not a rewrite.
- *
- * Values marked TBC are placeholders awaiting confirmation from the client.
+ * Seed values for the `siteSettings` singleton — the placeholders the site
+ * went into design review with. After the first seed the Studio owns these;
+ * this file is history, not the source of truth.
  */
 export const site = {
   name: "AADI ENTERPRISE",
   owner: "Nilesh Patel",
 
-  /**
-   * TBC — the client's own domain. Canonical URLs, the sitemap and robots.txt
-   * all build off this, so it has to be right before launch. Overridable at
-   * build time so staging and production don't need a code change.
-   */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aadienterprise.com",
 
   phone: "+919724820859",
   phoneDisplay: "97248 20859",

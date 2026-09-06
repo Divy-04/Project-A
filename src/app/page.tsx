@@ -9,27 +9,52 @@ import { ServiceArea } from "@/components/home/ServiceArea";
 import { Testimonials } from "@/components/home/Testimonials";
 import { CtaBand } from "@/components/CtaBand";
 import { Marquee } from "@/components/Marquee";
-import { services } from "@/data/services";
-import { site } from "@/data/site";
+import { imageUrl } from "@/sanity/image";
+import { getDivisions, getHomePage, getSettings } from "@/sanity/loaders";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  description:
-    "Aluminium doors, windows, partitions and ACP glazing, KDM PVC profile work, modular kitchens and wooden furniture in Himatnagar, Sabarkantha. Free site visit — call " +
-    site.phoneDisplay +
-    ".",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSettings();
+  return {
+    alternates: { canonical: "/" },
+    description:
+      "Aluminium doors, windows, partitions and ACP glazing, KDM PVC profile work, modular kitchens and wooden furniture in Himatnagar, Sabarkantha. Free site visit — call " +
+      site.phoneDisplay +
+      ".",
+  };
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [site, divisions, home] = await Promise.all([
+    getSettings(),
+    getDivisions(),
+    getHomePage(),
+  ]);
+
+  /* The slider takes two plain URLs. From the Studio they come pre-cropped
+     to 16:9 at 1600px by Sanity's CDN; until both photographs are uploaded
+     it keeps the illustrations that shipped with the design. */
+  const comparison =
+    home.beforeImage && home.afterImage
+      ? {
+          before: imageUrl(home.beforeImage, 1600, 16 / 9),
+          after: imageUrl(home.afterImage, 1600, 16 / 9),
+          alt: home.afterImage.alt ?? "Before and after",
+        }
+      : {
+          before: "/images/process/before.png",
+          after: "/images/process/after.png",
+          alt: "Process comparison",
+        };
+
   return (
     <>
       <Hero />
       <TrustStrip />
       <Services />
       <ComparisonSlider
-        beforeSrc="/images/process/before.png"
-        afterSrc="/images/process/after.png"
-        alt="Process comparison"
+        beforeSrc={comparison.before}
+        afterSrc={comparison.after}
+        alt={comparison.alt}
       />
       <FeaturedWork />
       <HowItWorks />
@@ -37,7 +62,7 @@ export default function HomePage() {
           given a bit of motion where the page changes gear. */}
       <Marquee
         label="Towns we work in"
-        items={[...site.serviceAreas, ...services.map((s) => s.title)]}
+        items={[...site.serviceAreas, ...divisions.map((d) => d.title)]}
       />
       <ServiceArea />
       <Testimonials />

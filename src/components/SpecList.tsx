@@ -1,4 +1,4 @@
-import type { Spec } from "@/data/services";
+import type { Spec } from "@/sanity/types";
 
 /**
  * "What the quote covers" — a plain specification list.

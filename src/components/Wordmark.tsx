@@ -1,4 +1,3 @@
-import { site } from "@/data/site";
 import Image from "next/image";
 
 /**
@@ -57,7 +56,7 @@ export function Wordmark({
           </span>
         )}
       </span>
-      <span className="sr-only">{site.name}</span>
+      <span className="sr-only">AADI ENTERPRISE</span>
     </span>
   );
 }

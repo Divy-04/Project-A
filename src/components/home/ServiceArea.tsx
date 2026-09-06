@@ -1,13 +1,15 @@
-import { Placeholder } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { SectionHead } from "@/components/SectionHead";
 import { PinIcon } from "@/components/icons";
-import { site } from "@/data/site";
+import { getHomePage, getSettings } from "@/sanity/loaders";
 
 /**
  * Named towns are a genuine local-search signal — and they are honest
  * coverage, not keyword stuffing, as long as the list stays accurate.
  */
-export function ServiceArea() {
+export async function ServiceArea() {
+  const [site, home] = await Promise.all([getSettings(), getHomePage()]);
+
   return (
     <section className="border-t border-line bg-surface py-20 lg:py-28">
       <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
@@ -32,11 +34,13 @@ export function ServiceArea() {
         </div>
 
         <div className="lg:col-span-6">
-          <Placeholder
+          <Photo
+            image={home.areaImage}
+            ratio="4/3"
+            sizes="(min-width: 1024px) 45vw, 92vw"
             label="Workshop / Shopfront"
             sublabel="Photo to be supplied · 4:3"
             tone="neutral"
-            ratio="4/3"
           />
         </div>
       </div>

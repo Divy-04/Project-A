@@ -1,4 +1,4 @@
-import type { FinishGroup } from "@/data/services";
+import type { FinishGroup } from "@/sanity/types";
 
 /**
  * Finish swatches.

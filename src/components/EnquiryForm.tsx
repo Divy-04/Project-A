@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { ArrowIcon, WhatsAppIcon } from "@/components/icons";
-import { services } from "@/data/services";
-import { site, telLink, waLink } from "@/data/site";
+import { telLink, waLink } from "@/lib/links";
+import type { SiteSettings } from "@/sanity/types";
 
 type State = "idle" | "sending" | "sent" | "error" | "unavailable";
 
@@ -13,17 +13,27 @@ const field =
 /**
  * Enquiry form.
  *
- * Posts to /api/enquiry, which relays to Telegram. The form deliberately
- * distinguishes "we could not deliver this" from "sent": if the endpoint is
- * unconfigured or Telegram is unreachable, the visitor is told plainly and
+ * Posts to /api/enquiry, which emails the owner via Brevo. The form
+ * deliberately distinguishes "we could not deliver this" from "sent": if the
+ * endpoint is unconfigured or Brevo is unreachable, the visitor is told plainly and
  * pointed at the phone, rather than being shown a thank-you for a message
  * that went nowhere.
  *
  * Call and WhatsApp remain the primary route and work with no JavaScript at
  * all; this is the third option, for the people who will not ring.
+ *
+ * A client component, so the division list and the contact details come in
+ * as props from the contact page rather than being fetched here.
  */
-export function EnquiryForm() {
+export function EnquiryForm({
+  divisions,
+  settings,
+}: {
+  divisions: { slug: string; title: string }[];
+  settings: Pick<SiteSettings, "owner" | "phone" | "phoneDisplay" | "whatsapp">;
+}) {
   const [state, setState] = useState<State>("idle");
+  const tel = telLink(settings);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,8 +70,8 @@ export function EnquiryForm() {
           Thanks — we have it.
         </h3>
         <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-2">
-          {site.owner} will come back to you, usually the same day. If it is
-          urgent, calling is faster than waiting for a reply.
+          {settings.owner} will come back to you, usually the same day. If it
+          is urgent, calling is faster than waiting for a reply.
         </p>
         <button
           type="button"
@@ -107,9 +117,9 @@ export function EnquiryForm() {
         <span className="eyebrow text-ink-3">What is it for</span>
         <select name="division" defaultValue="" className={`mt-2.5 ${field}`}>
           <option value="">Not sure yet</option>
-          {services.map((service) => (
-            <option key={service.slug} value={service.title}>
-              {service.title}
+          {divisions.map((division) => (
+            <option key={division.slug} value={division.title}>
+              {division.title}
             </option>
           ))}
         </select>
@@ -148,8 +158,8 @@ export function EnquiryForm() {
 
         <p className="text-[0.8125rem] text-ink-3">
           Or{" "}
-          <a href={telLink} className="link-wipe font-semibold text-ink">
-            call {site.phoneDisplay}
+          <a href={tel} className="link-wipe font-semibold text-ink">
+            call {settings.phoneDisplay}
           </a>
         </p>
       </div>
@@ -162,12 +172,15 @@ export function EnquiryForm() {
           {state === "unavailable"
             ? "The form is not connected yet."
             : "That did not send."}
-          <a href={telLink} className="font-semibold text-brand-dark">
-            Call {site.phoneDisplay}
+          <a href={tel} className="font-semibold text-brand-dark">
+            Call {settings.phoneDisplay}
           </a>
           <span className="text-ink-3">or</span>
           <a
-            href={waLink(`Hello ${site.owner}, I found your website. `)}
+            href={waLink(
+              settings,
+              `Hello ${settings.owner}, I found your website. `,
+            )}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-semibold text-brand-dark"

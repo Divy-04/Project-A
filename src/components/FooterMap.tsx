@@ -1,4 +1,5 @@
-import { mapsEmbedUrl, mapsUrl } from "@/data/site";
+import { mapsEmbedUrl, mapsUrl } from "@/lib/links";
+import { getSettings } from "@/sanity/loaders";
 import { ArrowIcon, PinIcon } from "./icons";
 
 /**
@@ -28,7 +29,7 @@ const tones = {
   },
 } as const;
 
-export function FooterMap({
+export async function FooterMap({
   tone = "dark",
   ratio = "16/10",
   label = "Get directions",
@@ -38,12 +39,15 @@ export function FooterMap({
   label?: string;
 }) {
   const t = tones[tone];
+  const site = await getSettings();
+  const directions = mapsUrl(site);
+  const embed = mapsEmbedUrl(site);
 
   return (
     <div className={`group overflow-hidden rounded-sm border ${t.frame}`}>
       <div className="relative w-full" style={{ aspectRatio: ratio }}>
         <iframe
-          src={mapsEmbedUrl}
+          src={embed}
           title="AADI Enterprise location map"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
@@ -56,7 +60,7 @@ export function FooterMap({
         className={`flex items-center justify-between gap-3 border-t px-4 py-3 ${t.divider}`}
       >
         <a
-          href={mapsUrl}
+          href={directions}
           target="_blank"
           rel="noopener noreferrer"
           className={`flex min-w-0 items-center gap-2 text-xs font-semibold transition-colors ${t.label}`}

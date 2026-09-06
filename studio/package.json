@@ -1,0 +1,27 @@
+{
+  "name": "aadi-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sanity Studio for the AADI ENTERPRISE site. Deployed to aadi-enterprise.sanity.studio; the Next site never bundles this.",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "seed": "sanity exec seed/seed.ts"
+  },
+  "dependencies": {
+    "@sanity/client": "^8.5.0",
+    "@sanity/color-input": "^6.1.4",
+    "@sanity/icons": "^5.2.1",
+    "@sanity/vision": "^6.12.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sanity": "^6.12.0",
+    "styled-components": "^6.5.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

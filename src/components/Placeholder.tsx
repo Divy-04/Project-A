@@ -9,6 +9,11 @@
  * Each of these becomes a Sanity image with a `next/image` + Sanity loader
  * once real photography arrives. Aspect ratios are already final, so the
  * swap causes no layout change.
+ *
+ * `fill` drops the aspect ratio and pins the block to its parent's edges,
+ * for slots whose size is decided by the layout around them rather than by
+ * the image — the About bento portrait borrows its height from the rows
+ * beside it. The parent must be `relative`.
  */
 
 const tones = {
@@ -27,6 +32,7 @@ export function Placeholder({
   ratio = "4/3",
   className = "",
   rounded = "rounded-sm",
+  fill = false,
 }: {
   label: string;
   sublabel?: string;
@@ -34,13 +40,14 @@ export function Placeholder({
   ratio?: string;
   className?: string;
   rounded?: string;
+  fill?: boolean;
 }) {
   const isDark = tone === "dark";
 
   return (
     <div
-      style={{ aspectRatio: ratio }}
-      className={`relative w-full overflow-hidden ${rounded} ${tones[tone]} ${className}`}
+      style={fill ? undefined : { aspectRatio: ratio }}
+      className={`${fill ? "absolute inset-0" : "relative w-full"} overflow-hidden ${rounded} ${tones[tone]} ${className}`}
       role="img"
       aria-label={`Placeholder for ${label} photograph`}
     >

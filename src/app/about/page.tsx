@@ -10,18 +10,19 @@ import { Button } from "@/components/Button";
 import { CountUp } from "@/components/CountUp";
 import { CtaBand } from "@/components/CtaBand";
 import { FooterMap } from "@/components/FooterMap";
-import { Placeholder } from "@/components/Placeholder";
+import { Photo } from "@/components/Photo";
 import { SectionHead } from "@/components/SectionHead";
 import { ArrowIcon, CheckIcon, PinIcon } from "@/components/icons";
-import { services } from "@/data/services";
-import { site } from "@/data/site";
-import { milestones, ownerStory, principles, statement } from "@/data/story";
+import { getAboutPage, getDivisions, getSettings } from "@/sanity/loaders";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: `${site.name} is a fabrication workshop in ${site.address.city}, run by ${site.owner}. Aluminium and glass, KDM PVC profile and furniture — measured, made and fitted by our own team.`,
-  alternates: { canonical: "/about" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSettings();
+  return {
+    title: "About",
+    description: `${site.name} is a fabrication workshop in ${site.address.city}, run by ${site.owner}. Aluminium and glass, KDM PVC profile and furniture — measured, made and fitted by our own team.`,
+    alternates: { canonical: "/about" },
+  };
+}
 
 /**
  * Three patterns carry this page, all of them layout rather than motion:
@@ -36,7 +37,12 @@ export const metadata: Metadata = {
  * Nothing here starts hidden — sticky and grid only — so the rule that came
  * out of removing the scroll-reveal still holds.
  */
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [site, about, divisions] = await Promise.all([
+    getSettings(),
+    getAboutPage(),
+    getDivisions(),
+  ]);
   const yearsInTrade = 2026 - site.establishedYear;
 
   return (
@@ -58,7 +64,7 @@ export default function AboutPage() {
             <p className="text-base leading-relaxed text-ink-2 lg:col-span-7 lg:text-[1.0625rem]">
               {site.name} is a fabrication business covering aluminium and
               glass, KDM PVC profile and made-to-measure furniture. Three
-              divisions, one crew, one place — Durga Complex,{" "}
+              divisions, one crew, one place — {site.address.line1.split(", ").pop()},{" "}
               {site.address.city}.
             </p>
 
@@ -82,48 +88,58 @@ export default function AboutPage() {
       </section>
 
       {/* Bento. The portrait is one cell of six, so the page does not lean on
-          a photograph that has not arrived yet. */}
-      <section className="bg-ground py-16 lg:py-24">
-        <div className="shell grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="col-span-2 lg:row-span-2">
-            <div className="h-full overflow-hidden rounded-md border border-line bg-surface">
-              <Placeholder
-                label={site.owner}
-                sublabel="Owner portrait · 4:5"
-                tone="neutral"
-                ratio="4/5"
-                rounded="rounded-none"
-              />
-              <div className="flex items-baseline justify-between gap-4 p-6">
-                <div>
-                  <p className="text-lg font-bold tracking-[-0.02em]">
-                    {site.owner}
-                  </p>
-                  <p className="mt-1 text-sm text-ink-3">
-                    Proprietor · photograph to be supplied
-                  </p>
-                </div>
+          a photograph that has not arrived yet.
+
+          At `lg` the portrait's height is not its own. The cell spans the
+          three rows beside it and the image fills whatever that comes to, so
+          the photograph can never outgrow the block — the whole grid has to
+          fit one laptop screen, and a fixed 4:5 slot two columns wide did
+          not (it ran past 900px and stretched the stat cards with it). Below
+          `lg` there is no row to borrow from, so the slot goes back to a 4:5
+          box, and at `md` it takes one column with the two stats stacked
+          beside it. */}
+      <section className="bg-ground py-16">
+        <div className="shell grid grid-cols-2 gap-3 lg:grid-cols-12">
+          <div className="col-span-2 md:col-span-1 md:row-span-2 lg:col-span-4 lg:row-span-3">
+            <div className="flex h-full flex-col overflow-hidden rounded-md border border-line bg-surface">
+              <div className="relative aspect-[4/5] lg:aspect-auto lg:min-h-0 lg:flex-1">
+                <Photo
+                  image={about.ownerPortrait}
+                  alt={about.ownerPortrait?.alt ?? `${site.owner}, proprietor`}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 92vw"
+                  label={site.owner}
+                  sublabel="Owner portrait"
+                  tone="neutral"
+                  rounded="rounded-none"
+                />
+              </div>
+              <div className="flex items-baseline justify-between gap-4 px-5 py-4">
+                <p className="text-[0.9375rem] font-bold tracking-[-0.02em]">
+                  {site.owner}
+                </p>
+                <p className="eyebrow text-ink-3">Proprietor</p>
               </div>
             </div>
           </div>
 
-          <div className="bento justify-between">
+          <div className="bento justify-between lg:col-span-4">
             <p className="eyebrow text-ink-3">Years in the trade</p>
-            <p className="mt-8 text-4xl font-extrabold tracking-[-0.03em] tabular-nums lg:text-[3.5rem]">
+            <p className="mt-6 text-4xl font-extrabold tracking-[-0.03em] tabular-nums lg:text-5xl">
               <CountUp value={yearsInTrade} suffix="+" />
             </p>
           </div>
 
-          <div className="bento justify-between">
+          <div className="bento justify-between lg:col-span-4">
             <p className="eyebrow text-ink-3">Projects completed</p>
-            <p className="mt-8 text-4xl font-extrabold tracking-[-0.03em] tabular-nums lg:text-[3.5rem]">
+            <p className="mt-6 text-4xl font-extrabold tracking-[-0.03em] tabular-nums lg:text-5xl">
               <CountUp value={site.projectsCompleted} suffix="+" />
             </p>
           </div>
 
-          <div className="bento col-span-2 justify-between border-brand bg-brand">
+          <div className="bento col-span-2 justify-between border-brand bg-brand lg:col-span-8">
             <p className="eyebrow text-white/60">Credential</p>
-            <div className="mt-8">
+            <div className="mt-6">
               <p className="flex items-start gap-3 text-xl font-bold tracking-[-0.02em] text-white lg:text-2xl">
                 <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
                   <CheckIcon className="h-3 w-3" />
@@ -137,7 +153,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="bento col-span-2 lg:col-span-2">
+          <div className="bento col-span-2 md:col-span-1 lg:col-span-4">
             <p className="eyebrow text-ink-3">Where we work</p>
             <p className="mt-4 flex-1 text-[0.9375rem] leading-relaxed text-ink-2">
               {site.serviceAreas.slice(0, 4).join(", ")} and the towns between
@@ -152,8 +168,8 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          <div className="col-span-2 lg:col-span-2">
-            <FooterMap tone="light" ratio="16/9" label="Get directions" />
+          <div className="col-span-2 md:col-span-1 lg:col-span-4">
+            <FooterMap tone="light" ratio="2/1" label="Get directions" />
           </div>
         </div>
       </section>
@@ -178,7 +194,7 @@ export default function AboutPage() {
 
           <div className="lg:col-span-8">
             <div className="space-y-6 text-base leading-relaxed text-ink-2 sm:text-[1.0625rem]">
-              {ownerStory.map((paragraph) => (
+              {about.ownerStory.map((paragraph) => (
                 <p key={paragraph.slice(0, 32)}>{paragraph}</p>
               ))}
             </div>
@@ -193,7 +209,7 @@ export default function AboutPage() {
 
         <div className="relative z-10 shell py-20 lg:py-28">
           <p className="eyebrow text-brand-lift">How we work</p>
-          <p className="display mt-8 max-w-4xl text-white">{statement}</p>
+          <p className="display mt-8 max-w-4xl text-white">{about.statement}</p>
         </div>
       </section>
 
@@ -211,9 +227,9 @@ export default function AboutPage() {
           </div>
 
           <ol className="lg:col-span-8">
-            {milestones.map((milestone, i) => (
+            {about.milestones.map((milestone, i) => (
               <li
-                key={milestone.year}
+                key={`${milestone.year}-${milestone.title}`}
                 className="grid grid-cols-[3.5rem_1fr] gap-x-5 border-t border-line py-8 sm:grid-cols-[7rem_1fr] sm:gap-x-10 last:border-b"
               >
                 <div>
@@ -248,7 +264,7 @@ export default function AboutPage() {
           />
 
           <ol className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2">
-            {principles.map((principle, i) => (
+            {about.principles.map((principle, i) => (
               <li key={principle.title} className="border-t border-line pt-7">
                 <p className="text-5xl font-extrabold tracking-[-0.04em] text-line-strong tabular-nums lg:text-6xl">
                   {String(i + 1).padStart(2, "0")}
@@ -277,7 +293,7 @@ export default function AboutPage() {
           />
 
           <div className="mt-14 grid gap-8 md:grid-cols-3">
-            {services.map((service, i) => (
+            {divisions.map((service, i) => (
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}

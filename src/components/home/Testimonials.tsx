@@ -1,7 +1,10 @@
 import { SectionHead } from "@/components/SectionHead";
-import { testimonials } from "@/data/testimonials";
+import { getTestimonials } from "@/sanity/loaders";
 
-export function Testimonials() {
+export async function Testimonials() {
+  const testimonials = await getTestimonials();
+  if (testimonials.length === 0) return null;
+
   return (
     <section className="bg-ground py-20 lg:py-28">
       <div className="shell">
@@ -10,7 +13,7 @@ export function Testimonials() {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {testimonials.map((t) => (
             <figure
-              key={t.quote}
+              key={t._id}
               className="flex flex-col justify-between border border-line bg-surface p-8"
             >
               <blockquote className="text-[0.9375rem] leading-relaxed text-ink-2">
