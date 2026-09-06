@@ -23,7 +23,7 @@ export function CtaBand() {
         <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0 lg:flex-col xl:flex-row">
           <Button href={telLink} variant="solidLight" size="lg">
             <PhoneIcon className="h-4 w-4" />
-            {site.phoneDisplay}
+            Give us a call
           </Button>
           <Button
             href={waLink(

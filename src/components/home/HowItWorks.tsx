@@ -1,11 +1,7 @@
 import { SectionHead } from "@/components/SectionHead";
 import { ScrollRig } from "@/components/ScrollRig";
-import {
-  SceneDeliver,
-  SceneFabricate,
-  SceneFit,
-  SceneMeasure,
-} from "./scenes";
+
+import Image from "next/image";
 
 const steps = [
   {
@@ -13,28 +9,28 @@ const steps = [
     title: "We measure, at your site",
     note: "Kitchen run · survey",
     body: "We come out, measure the run ourselves and check the wall, the level and the fall. Nothing is taken over the phone, and there is no charge for the visit.",
-    Scene: SceneMeasure,
+    imageSrc: "/images/process/1.png",
   },
   {
     kicker: "Fabrication",
     title: "We fabricate, on our own bench",
     note: "Carcass · door · top",
     body: "Cut, mitred and built up part by part in our workshop from the measurements we took — not bought in ready-made and forced to fit.",
-    Scene: SceneFabricate,
+    imageSrc: "/images/process/2.png",
   },
   {
     kicker: "In transit",
     title: "We deliver, with our own team",
     note: "Wrapped · en route",
     body: "Wrapped and brought to your site when the work is ready. Nothing is handed to a transporter or a subcontractor along the way.",
-    Scene: SceneDeliver,
+    imageSrc: "/images/process/3.png",
   },
   {
     kicker: "Installation",
     title: "We fit, and we finish",
     note: "Seated · sealed · done",
     body: "Seated, levelled, sealed and cleaned up, to the same dimensions we surveyed. If something needs easing later, we come back and ease it.",
-    Scene: SceneFit,
+    imageSrc: "/images/process/4.png",
   },
 ];
 
@@ -55,7 +51,7 @@ export function HowItWorks() {
       <div data-hiw-track className="relative">
         <div className="hiw-pin bg-ground">
           <div className="hiw-strip h-full">
-            {steps.map(({ kicker, title, note, body, Scene }, i) => {
+            {steps.map(({ kicker, title, note, body, imageSrc }, i) => {
               const n = String(i + 1).padStart(2, "0");
 
               return (
@@ -66,7 +62,7 @@ export function HowItWorks() {
                           the copy beside it — so the whole card is hidden from
                           assistive tech, title block included. */}
                       <div className="order-1 lg:order-2" aria-hidden="true">
-                        <div className="mx-auto w-full max-w-[288px] overflow-hidden rounded-lg border border-line bg-surface sm:max-w-[400px] lg:mr-0 lg:ml-auto lg:max-w-[560px]">
+                        <div className="mx-auto w-full max-w-[340px] overflow-hidden rounded-lg border border-line bg-surface sm:max-w-[400px] lg:mr-0 lg:ml-auto lg:max-w-[560px]">
                           <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2 sm:px-4 sm:py-2.5">
                             <span className="eyebrow truncate text-ink-3">
                               {note}
@@ -75,12 +71,9 @@ export function HowItWorks() {
                               {n} / 04
                             </span>
                           </div>
-                          <svg
-                            viewBox="0 0 600 460"
-                            className="block h-auto w-full"
-                          >
-                            <Scene />
-                          </svg>
+                          <div className="relative flex aspect-[4/3] w-full items-center justify-center bg-white">
+                            <Image src={imageSrc} alt={title} fill className="object-cover" />
+                          </div>
                         </div>
                       </div>
 

@@ -1,4 +1,5 @@
 import { site } from "@/data/site";
+import Image from "next/image";
 
 /**
  * The partition mark — a monoline frame with a mullion and a half transom.
@@ -35,15 +36,23 @@ export function Wordmark({
   className?: string;
 }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <Mark className="h-6 w-6 shrink-0 text-brand" />
+    <span className={`inline-flex items-end gap-1.5 sm:gap-2.5 ${className}`}>
+      <span className="relative h-10 w-14 shrink-0 translate-y-1 overflow-hidden rounded-sm sm:h-14 sm:w-20 sm:translate-y-2">
+        <Image
+          src="/images/process/logo.png?v=2"
+          alt="AADI Enterprise logo"
+          fill
+          sizes="80px"
+          className="object-contain"
+        />
+      </span>
       <span className="flex flex-col leading-none">
-        <span className="text-[1.0625rem] font-extrabold tracking-[-0.02em] uppercase sm:text-lg">
-          <span className="text-brand">Aadi</span>{" "}
-          <span className="text-ink">Enterprise</span>
+        <span className="text-base font-extrabold tracking-[-0.02em] uppercase sm:text-xl">
+          <span className="text-brand">AADI</span>{" "}
+          <span className="text-ink">ENTERPRISE</span>
         </span>
         {showTagline && (
-          <span className="eyebrow mt-1 hidden text-ink-3 sm:block">
+          <span className="eyebrow mt-1 block text-[0.4375rem] tracking-[0.04em] text-ink-3 sm:text-[0.5625rem] sm:tracking-[0.16em]">
             Aluminium · Glass · PVC · Furniture
           </span>
         )}
@@ -56,13 +65,21 @@ export function Wordmark({
 /** Stacked variant used in the footer, on a dark ground. */
 export function WordmarkStacked({ className = "" }: { className?: string }) {
   return (
-    <span className={`inline-flex flex-col gap-3 ${className}`}>
-      <Mark className="h-8 w-8 text-brand" />
+    <span className={`inline-flex items-end gap-1.5 sm:gap-2.5 ${className}`}>
+      <span className="relative h-10 w-14 shrink-0 translate-y-1 overflow-hidden rounded-sm sm:h-14 sm:w-20 sm:translate-y-2">
+        <Image
+          src="/images/process/logo.png?v=2"
+          alt="AADI Enterprise logo"
+          fill
+          sizes="80px"
+          className="object-contain"
+        />
+      </span>
       <span className="flex flex-col leading-none">
-        <span className="text-xl font-extrabold tracking-[-0.02em] uppercase text-white">
-          <span className="text-brand">Aadi</span> Enterprise
+        <span className="text-base font-extrabold tracking-[-0.02em] uppercase text-white sm:text-xl">
+          <span className="text-brand">AADI</span> ENTERPRISE
         </span>
-        <span className="eyebrow mt-2 text-white/45">
+        <span className="eyebrow mt-1 text-[0.4375rem] tracking-[0.04em] text-white/45 sm:mt-1 sm:text-[0.5625rem] sm:tracking-[0.16em]">
           Aluminium · Glass · PVC · Furniture
         </span>
       </span>

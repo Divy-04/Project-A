@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
+import { ComparisonSlider } from "@/components/home/ComparisonSlider";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { Services } from "@/components/home/Services";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
@@ -25,6 +26,11 @@ export default function HomePage() {
       <Hero />
       <TrustStrip />
       <Services />
+      <ComparisonSlider
+        beforeSrc="/images/process/before.png"
+        afterSrc="/images/process/after.png"
+        alt="Process comparison"
+      />
       <FeaturedWork />
       <HowItWorks />
       {/* The towns, running past — the same list the footer states plainly,

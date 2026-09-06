@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectIndex } from "./ProjectIndex";
 import { GridIcon, ListIcon } from "./icons";
@@ -44,6 +44,20 @@ export function GalleryBrowser({
   const [division, setDivision] = useState("all");
   const [view, setView] = useState<"grid" | "index">("grid");
   const railRef = useRef<HTMLDivElement>(null);
+  const projectsSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      projectsSectionRef.current?.scrollIntoView({
+        block: "start",
+        behavior: "auto",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   /**
    * Switching division has to reset the rail, not just re-fill it. Without
@@ -182,7 +196,10 @@ export function GalleryBrowser({
         </div>
       </div>
 
-      <section className="bg-ground py-14 lg:py-20">
+      <section
+        ref={projectsSectionRef}
+        className="scroll-mt-16 bg-ground py-14 lg:scroll-mt-0 lg:py-20"
+      >
         <div className="shell">
           {/* Announced on change, so a screen-reader user knows the filter did
               something — the visual result is off-screen for them. */}

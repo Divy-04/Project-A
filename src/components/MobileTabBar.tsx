@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { nav } from "@/data/nav";
-import { site, telLink } from "@/data/site";
-import { ChatIcon, HomeIcon, InfoIcon, PhoneIcon, WorkIcon } from "./icons";
+import { site, waLink } from "@/data/site";
+import {
+  ChatIcon,
+  HomeIcon,
+  InfoIcon,
+  WhatsAppIcon,
+  WorkIcon,
+} from "./icons";
 
 /**
  * App-style bottom navigation for phones and tablets.
@@ -18,11 +24,8 @@ import { ChatIcon, HomeIcon, InfoIcon, PhoneIcon, WorkIcon } from "./icons";
  * expects and better for us: the links are in the served HTML on every page
  * rather than behind a button.
  *
- * Call keeps the centre slot in brand red. For a trade business it is the
- * highest-converting element on the site and it must not lose its position to
- * navigation — most visitors arrive on a phone and want to talk to someone.
- * WhatsApp moved up to the header, where it sits within the same thumb arc
- * and no longer competes with the gallery's filter rail for the bottom edge.
+ * WhatsApp keeps the centre slot and red action treatment. The header carries
+ * the phone action on mobile.
  *
  * The bar is deliberately flat rather than carrying a raised centre button:
  * a floating action button pokes ~14px above the bar, and on /gallery the
@@ -85,14 +88,15 @@ export function MobileTabBar() {
 
         <li>
           <a
-            href={telLink}
-            aria-label={`Call ${site.phoneDisplay}`}
+            href={waLink(
+              `Hello ${site.owner}, I found your website and would like a quote for `,
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Message us on WhatsApp"
             className="flex h-[3.25rem] flex-col items-center justify-center gap-1 rounded-2xl bg-brand text-white shadow-[0_6px_16px_-8px_rgba(217,58,40,0.9)]"
           >
-            <PhoneIcon className="h-[1.125rem] w-[1.125rem]" />
-            <span className="text-[0.625rem] leading-none font-semibold tracking-[0.01em]">
-              Call
-            </span>
+            <WhatsAppIcon className="h-6 w-6" />
           </a>
         </li>
 

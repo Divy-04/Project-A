@@ -64,6 +64,10 @@ export const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encode
   `${site.address.line1}, ${site.address.city}, ${site.address.state} ${site.address.postalCode}`,
 )}`;
 
+export const mapsEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(
+  `${site.address.line1}, ${site.address.city}, ${site.address.state} ${site.address.postalCode}`,
+)}&output=embed`;
+
 export const waLink = (message = "Hello, I would like a quote for") =>
   `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 

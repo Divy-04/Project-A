@@ -1,9 +1,10 @@
+"use client";
 import Link from "next/link";
 import { Wordmark } from "./Wordmark";
-import { PhoneIcon, WhatsAppIcon } from "./icons";
+import { PhoneIcon } from "./icons";
 import { nav } from "@/data/nav";
-import { site, telLink, waLink } from "@/data/site";
-
+import { site, telLink } from "@/data/site";
+import { usePathname } from "next/navigation";
 /**
  * On large screens this is the whole navigation. Below `lg` the destinations
  * live in `MobileTabBar` at the bottom of the screen, so the header keeps
@@ -15,9 +16,11 @@ import { site, telLink, waLink } from "@/data/site";
  * two different corners.
  */
 export function Header() {
+  const pathname = usePathname();
   return (
+
     <header className="sticky top-0 z-40 border-b border-line bg-ground/85 backdrop-blur-md">
-      <div className="shell flex h-16 items-center justify-between gap-6 md:h-[4.5rem]">
+      <div className="shell flex h-16 items-center justify-between gap-2 md:h-[4.5rem] md:gap-6">
         <Link href="/" aria-label={`${site.name} — home`} className="shrink-0">
           <Wordmark />
         </Link>
@@ -28,7 +31,7 @@ export function Header() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-sm font-medium text-ink-2 transition-colors hover:text-ink"
+                  className={`text-sm font-medium transition-colors ${pathname === item.href ? 'text-red-600 hover:text-red-600' : 'text-ink-2 hover:text-ink'}`}
                 >
                   {item.label}
                 </Link>
@@ -39,23 +42,19 @@ export function Header() {
 
         <a
           href={telLink}
-          className="hidden items-center gap-2 rounded-sm bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark lg:inline-flex"
+          className="hidden min-w-28 items-center justify-center gap-2 rounded-sm bg-brand px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-dark lg:inline-flex"
         >
           <PhoneIcon className="h-3.5 w-3.5" />
-          {site.phoneDisplay}
+          Get a quote
         </a>
 
         <a
-          href={waLink(
-            `Hello ${site.owner}, I found your website and would like a quote for `,
-          )}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Message us on WhatsApp"
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-[#1da851] pr-4 pl-3 text-sm font-semibold text-white lg:hidden"
+          href={telLink}
+          aria-label={`Call ${site.phoneDisplay}`}
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-brand px-2.5 text-xs font-semibold text-white lg:hidden"
         >
-          <WhatsAppIcon className="h-[1.125rem] w-[1.125rem]" />
-          WhatsApp
+          <PhoneIcon className="h-4 w-4" />
+          Get a quote
         </a>
       </div>
     </header>

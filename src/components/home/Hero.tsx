@@ -6,8 +6,8 @@ import { site, telLink } from "@/data/site";
 export function Hero() {
   return (
     <section className="setout wash-brand relative overflow-hidden bg-ground">
-      <div className="relative z-10 shell grid items-center gap-12 pt-14 pb-16 lg:grid-cols-12 lg:gap-16 lg:pt-20 lg:pb-24">
-        <div className="lg:col-span-6">
+      <div className="relative z-10 shell grid items-center gap-12 pt-8 pb-16 lg:grid-cols-12 lg:gap-16 lg:pt-12 lg:pb-24">
+        <div className="lg:col-span-6 lg:-translate-y-[30px]">
           <p className="eyebrow text-ink-3">
             {site.address.city} · {site.address.district} · Since{" "}
             {site.establishedYear}
@@ -21,30 +21,31 @@ export function Hero() {
           <p className="mt-6 max-w-lg text-base leading-relaxed text-ink-2 sm:text-[1.0625rem]">
             Three divisions under one workshop — aluminium and glass
             fabrication, KDM PVC profile, and made-to-measure furniture.
-            Measured, fabricated and fitted by our own team.
+            All measured, fabricated and expertly installed by our team.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Button href={telLink} size="lg" className="w-full sm:w-auto">
               <PhoneIcon className="h-4 w-4" />
-              Call {site.phoneDisplay}
+              Call us
             </Button>
             <Button
               href="/gallery"
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto"
+              className="w-full border-2 border-ink/25 sm:w-auto"
             >
               See our work
               <ArrowIcon className="h-4 w-4" />
             </Button>
           </div>
 
-          <p className="mt-9 flex items-center gap-2.5 text-sm font-medium text-ink-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-tint text-brand">
-              <CheckIcon className="h-3 w-3" />
+          <p className="mt-9 inline-flex items-center gap-2.5 rounded-sm border border-brand/25 bg-brand-tint px-3 py-2 text-sm font-semibold text-brand-ink">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-white shadow-sm">
+              <CheckIcon className="h-3.5 w-3.5" />
             </span>
-            {site.credential}
+            <span>Authorised Distributor —</span>
+            <span className="text-ink">KDM PVC Profile</span>
           </p>
         </div>
 
