@@ -33,8 +33,8 @@ export const milestones: Milestone[] = [
   },
   {
     year: "2019",
-    title: "Authorised for KDM profile",
-    body: "The KDM distributorship makes PVC profile a division in its own right, bought direct rather than through a middleman — which is what keeps the quoted section and the fitted section the same thing.",
+    title: "PVC profile joins the workshop",
+    body: "Doors and panelling, and later kitchens and wardrobes, in PVC board become a division of their own, built in Kaka and Polywood board and fitted by the same crew.",
   },
   {
     year: "2022",
@@ -44,7 +44,7 @@ export const milestones: Milestone[] = [
   {
     year: "Today",
     title: "Three divisions, one crew",
-    body: "Aluminium and glass, KDM PVC profile, and furniture — measured, fabricated, delivered and fitted by the same team, across Himatnagar and the towns around it.",
+    body: "Aluminium and glass, PVC profile, and furniture — measured, fabricated, delivered and fitted by the same team, across Himatnagar and the towns around it.",
   },
 ];
 

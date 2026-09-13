@@ -2,7 +2,7 @@ import { ComponentIcon } from "@sanity/icons/Component";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 /**
- * One of the three divisions — Aluminium & Glass, PVC / KDM Profile,
+ * One of the three divisions — Aluminium & Glass, PVC Profile,
  * Furniture. Each has its own page at /services/<slug>, and those pages are
  * built to stand up with no photographs at all: the finishes, the
  * specification list and the FAQs are the substance. All three live here so

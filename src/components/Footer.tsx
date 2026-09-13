@@ -135,7 +135,6 @@ export async function Footer() {
           <p>
             © {year} {site.name}. Proprietor: {site.owner}.
           </p>
-          <p>{site.credential}</p>
         </div>
       </div>
     </footer>

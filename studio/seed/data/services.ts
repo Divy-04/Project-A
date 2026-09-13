@@ -104,16 +104,19 @@ export const services: Service[] = [
     ],
   },
   {
-    slug: "pvc-kdm-profile",
-    title: "PVC — KDM Profile",
+    slug: "pvc-profile",
+    title: "PVC Profile",
     short: "PVC",
     blurb:
-      "Authorised KDM distributor. Waterproof, termite-proof PVC profile for doors, shutters, ceilings and wall panelling.",
+      "Waterproof, termite-proof PVC profile for doors, shutters, ceilings and wall panelling.",
     intro:
-      "PVC profile earns its place in the wet parts of a building. A bathroom door in wood will swell, warp and eventually need replacing; the same door in KDM profile will not. We are an authorised KDM distributor, so the profile is bought direct — the section you are quoted is the section that gets fitted, not a thinner lookalike.",
+      "PVC profile earns its place in the wet parts of a building. A bathroom door in wood will swell, warp and eventually need replacing; the same door in PVC will not. We build in Kaka and Polywood board, two brands whose sheets hold their shape and colour, and the sample you are shown is the board that gets cut.",
     items: [
       "PVC Doors",
       "PVC Shutters",
+      "PVC Modular Kitchens",
+      "PVC Wardrobes",
+      "Bathroom Vanities",
       "Ceiling Panelling",
       "Wall Panelling",
       "Bathroom & Utility Doors",
@@ -145,17 +148,18 @@ export const services: Service[] = [
       },
     ],
     specs: [
+      { label: "Board", value: "Kaka or Polywood PVC board" },
       { label: "Door thickness", value: "Standard and heavy-duty section" },
       { label: "Frame", value: "Matching PVC frame, no wooden chowkhat needed" },
       { label: "Fittings", value: "Stainless hinges, lock and handle" },
       { label: "Panelling", value: "Ceiling and full-height wall, with matched skirting" },
       { label: "Included in the quote", value: "Measurement, frame, shutter, fittings and fitting" },
-      { label: "Best used for", value: "Bathrooms, utility areas, wash areas, damp walls" },
+      { label: "Best used for", value: "Bathrooms, kitchens, utility areas, wash areas, damp walls" },
     ],
     faqs: [
       {
         q: "Does PVC yellow in sunlight?",
-        a: "Cheap profile does. Genuine KDM section is UV-stabilised and holds its colour, which is most of the reason we buy direct rather than from whoever is cheapest that month.",
+        a: "Cheap profile does. The Kaka and Polywood board we use is UV-stabilised and holds its colour, which is why we stay with those two rather than whoever is cheapest that month.",
       },
       {
         q: "Will a PVC door take a normal lock?",
@@ -167,7 +171,7 @@ export const services: Service[] = [
       },
       {
         q: "Is it only for bathrooms?",
-        a: "No. Ceilings, feature walls, shop interiors and utility doors are all common. It is simply at its best where water is.",
+        a: "No. Kitchens, wardrobes, ceilings, feature walls, shop interiors and utility doors are all common. It is simply at its best where water is.",
       },
     ],
   },

@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${site.name}`,
     },
     description:
-      "Aluminium doors, windows, partitions and ACP glazing, KDM PVC profile work, modular kitchens and wooden furniture. Serving Himatnagar and Sabarkantha since " +
+      "Aluminium doors, windows, partitions and ACP glazing, PVC profile work, modular kitchens and wooden furniture. Serving Himatnagar and Sabarkantha since " +
       site.establishedYear +
       ".",
     openGraph: {

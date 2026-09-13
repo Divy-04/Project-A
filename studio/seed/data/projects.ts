@@ -10,7 +10,7 @@
 export type Project = {
   slug: string;
   title: string;
-  category: "aluminium-glass" | "pvc-kdm-profile" | "furniture";
+  category: "aluminium-glass" | "pvc-profile" | "furniture";
   categoryLabel: string;
   location: string;
   completedOn: string;
@@ -56,12 +56,12 @@ export const projects: Project[] = [
   {
     slug: "pvc-door-set-bathroom-utility",
     title: "PVC Door Set, Bath & Utility",
-    category: "pvc-kdm-profile",
-    categoryLabel: "PVC — KDM Profile",
+    category: "pvc-profile",
+    categoryLabel: "PVC Profile",
     location: "Himatnagar",
     completedOn: "2026-04",
     summary:
-      "Four waterproof KDM profile doors with matching frames, moulded panel faces and stainless fittings.",
+      "Four waterproof PVC profile doors with matching frames, moulded panel faces and stainless fittings.",
     photoCount: 3,
     featured: true,
   },
@@ -92,8 +92,8 @@ export const projects: Project[] = [
   {
     slug: "pvc-ceiling-panelling-prantij",
     title: "PVC Ceiling & Wall Panelling",
-    category: "pvc-kdm-profile",
-    categoryLabel: "PVC — KDM Profile",
+    category: "pvc-profile",
+    categoryLabel: "PVC Profile",
     location: "Prantij",
     completedOn: "2026-02",
     summary:
@@ -128,8 +128,8 @@ export const projects: Project[] = [
   {
     slug: "pvc-wall-panelling-shop-modasa",
     title: "PVC Wall Panelling, Retail",
-    category: "pvc-kdm-profile",
-    categoryLabel: "PVC — KDM Profile",
+    category: "pvc-profile",
+    categoryLabel: "PVC Profile",
     location: "Modasa",
     completedOn: "2025-12",
     summary:
@@ -154,7 +154,7 @@ export const projectsInCategory = (category: Project["category"]) =>
 export const toneForCategory = (category: string) =>
   ({
     "aluminium-glass": "cool",
-    "pvc-kdm-profile": "neutral",
+    "pvc-profile": "neutral",
     furniture: "warm",
   })[category] ?? "neutral";
 

@@ -127,14 +127,6 @@ export const siteSettings = defineType({
       validation: (rule) => rule.required().integer().min(0),
     }),
     defineField({
-      name: "credential",
-      title: "Credential",
-      type: "string",
-      group: "business",
-      description: "The line of trust off the business card, e.g. \"Authorised Distributor — KDM PVC Profile\".",
-      validation: (rule) => rule.required().max(80),
-    }),
-    defineField({
       name: "serviceAreas",
       title: "Towns we work in",
       type: "array",

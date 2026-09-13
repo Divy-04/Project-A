@@ -12,14 +12,14 @@ import { CtaBand } from "@/components/CtaBand";
 import { FooterMap } from "@/components/FooterMap";
 import { Photo } from "@/components/Photo";
 import { SectionHead } from "@/components/SectionHead";
-import { ArrowIcon, CheckIcon, PinIcon } from "@/components/icons";
+import { ArrowIcon, PinIcon } from "@/components/icons";
 import { getAboutPage, getDivisions, getSettings } from "@/sanity/loaders";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSettings();
   return {
     title: "About",
-    description: `${site.name} is a fabrication workshop in ${site.address.city}, run by ${site.owner}. Aluminium and glass, KDM PVC profile and furniture — measured, made and fitted by our own team.`,
+    description: `${site.name} is a fabrication workshop in ${site.address.city}, run by ${site.owner}. Aluminium and glass, PVC profile and furniture — measured, made and fitted by our own team.`,
     alternates: { canonical: "/about" },
   };
 }
@@ -63,7 +63,7 @@ export default async function AboutPage() {
           <div className="mt-12 grid gap-10 border-t border-line pt-10 lg:grid-cols-12 lg:gap-16">
             <p className="text-base leading-relaxed text-ink-2 lg:col-span-7 lg:text-[1.0625rem]">
               {site.name} is a fabrication business covering aluminium and
-              glass, KDM PVC profile and made-to-measure furniture. Three
+              glass, PVC profile and made-to-measure furniture. Three
               divisions, one crew, one place — {site.address.line1.split(", ").pop()},{" "}
               {site.address.city}.
             </p>
@@ -138,17 +138,16 @@ export default async function AboutPage() {
           </div>
 
           <div className="bento col-span-2 justify-between border-brand bg-brand lg:col-span-8">
-            <p className="eyebrow text-white/60">Credential</p>
+            <p className="eyebrow text-white/60">What we build in</p>
             <div className="mt-6">
-              <p className="flex items-start gap-3 text-xl font-bold tracking-[-0.02em] text-white lg:text-2xl">
-                <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
-                  <CheckIcon className="h-3 w-3" />
-                </span>
-                {site.credential}
+              <p className="text-xl font-bold tracking-[-0.02em] text-white lg:text-2xl">
+                Domal aluminium and toughened glass. Kaka and Polywood PVC
+                board. Marine ply, HDHMR and laminate.
               </p>
-              <p className="mt-3 pl-8 text-[0.9375rem] leading-relaxed text-white/75">
-                Profile is bought direct, so the section you are quoted is the
-                section that gets fitted.
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-white/75">
+                One set of sections, boards and glass across all three
+                divisions, chosen because they hold their shape and colour. Ask
+                to see a sample before you decide.
               </p>
             </div>
           </div>

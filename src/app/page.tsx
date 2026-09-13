@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     alternates: { canonical: "/" },
     description:
-      "Aluminium doors, windows, partitions and ACP glazing, KDM PVC profile work, modular kitchens and wooden furniture in Himatnagar, Sabarkantha. Free site visit — call " +
+      "Aluminium doors, windows, partitions and ACP glazing, PVC profile work, modular kitchens and wooden furniture in Himatnagar, Sabarkantha. Free site visit — call " +
       site.phoneDisplay +
       ".",
   };

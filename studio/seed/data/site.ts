@@ -28,8 +28,6 @@ export const site = {
   establishedYear: 2011, // TBC
   projectsCompleted: 750, // TBC
 
-  /** Trust credential straight off the business card. */
-  credential: "Authorised Distributor — KDM PVC Profile",
 
   /** TBC — confirm which towns he actually travels to. */
   serviceAreas: [

@@ -122,16 +122,6 @@ export default async function ServicePage({
                 </li>
               ))}
             </ul>
-
-            {service.slug === "pvc-kdm-profile" && (
-              <p className="mt-9 max-w-2xl rounded-sm border border-line bg-surface p-5 text-[0.9375rem] leading-relaxed text-ink-2">
-                <span className="font-semibold text-ink">
-                  {site.credential}.
-                </span>{" "}
-                Profile is bought direct, so the section you are quoted is the
-                section that gets fitted.
-              </p>
-            )}
           </div>
 
           <div className="lg:col-span-5">

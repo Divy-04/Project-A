@@ -16,7 +16,7 @@ Three divisions, carried at **equal weight** everywhere:
 | Division | Slug |
 | --- | --- |
 | Aluminium & Glass | `aluminium-glass` |
-| PVC — KDM Profile | `pvc-kdm-profile` |
+| PVC Profile | `pvc-profile` |
 | Furniture & Interiors | `furniture` |
 
 The site's primary job is to be **found** — to rank locally for Himatnagar and

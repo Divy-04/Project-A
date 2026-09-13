@@ -4,7 +4,7 @@
 
 Marketing site for a fabrication business in Himatnagar, Sabarkantha, Gujarat.
 Owner: Nilesh Patel. Three divisions, **equal weight** — Aluminium & Glass,
-PVC / KDM Profile, and Furniture. The reference photos the client sent skew
+PVC Profile, and Furniture. The reference photos the client sent skew
 furniture only because that's what he happened to have on hand; never let the
 site tilt that way.
 
@@ -27,6 +27,10 @@ three pages get built. Do not start Sanity or deployment work early.
 is deployed and the site reads Sanity (see **Sanity** below). The enquiry form
 emails via Brevo — decided 6 Sep in place of Telegram, wired and tested. Step 3
 not started.
+
+**13 Sep 2026:** the KDM partnership ended and every trace of it came out of
+the site, the dataset and the Studio — see **PVC division — no
+distributorship** below.
 
 **Next:** an SEO pass on 7 Sep 2026 (see **SEO pass** below), then deployment
 to Cloudflare under **aadienterprise.in** — domain decided, not yet bought.
@@ -351,6 +355,42 @@ the Studio is live at https://aadi-enterprise.sanity.studio — see **Sanity**.
 **Not started:** the SEO pass (7 Sep), deployment (and with it the publish →
 rebuild webhook), real photos, real testimonials.
 
+## PVC division — no distributorship (13 Sep 2026)
+
+The KDM partnership ended. Nilesh holds **no authorised distribution with
+anyone**; he builds PVC work in **Kaka and Polywood** board. Those are
+materials he buys, not a dealership — never print "authorised", "dealer" or
+"distributor" again unless he produces the paperwork.
+
+What changed, all live in the dataset and the code:
+
+- The division is **"PVC Profile"** — short "PVC", slug `pvc-profile`, no
+  dash. The dash in the old name separated material from brand; with the brand
+  gone "PVC Profile" is also the phrase people search. Its Sanity document
+  keeps the old id `division-pvc-kdm-profile`: the id is internal, renaming it
+  means deleting a referenced document, and the seed pins it in `DIVISION_IDS`
+  so a forced re-seed updates the document instead of adding a second PVC
+  division. The old `/services/pvc-kdm-profile` 404s — nothing was live, so no
+  redirect.
+- Kaka and Polywood are named where a buyer is choosing PVC and nowhere else:
+  the PVC page's intro, a "Board" spec row, the yellowing FAQ, and the About
+  2019 milestone. **PVC kitchens, wardrobes and bathroom vanities are items of
+  this division**; Furniture keeps ply, HDHMR and laminate work.
+- The `credential` field is gone from Site settings — schema, GROQ, types, seed
+  and the dataset (Studio redeployed 13 Sep). The homepage badge and footer
+  line that printed it are deleted, not hidden. The trust strip's fourth cell
+  is **"Free / Site visit and quote"** — chosen over towns served and over a
+  Google rating, which the client does not want there. The About record grid's
+  red cell is a **"What we build in"** materials line typed in code, no tick
+  icon, after owner-led and word-of-mouth lines were rejected.
+- The division `_id` is no longer projected in GROQ. Nothing read it, and it
+  was carrying the old name into the gallery's client props — the only place
+  "kdm" survived after the visible copy was clean. Verified: all 18 sitemap
+  routes plus robots serve zero "kdm" and zero "authorised" in the full HTML.
+
+Done one page at a time on the local server with Divy's go before each edit,
+and every Sanity change was a patch of the existing document, not a re-seed.
+
 ## Sanity
 
 Project `hhvsb0rp`, dataset `production`, **public**. The site reads published
@@ -393,8 +433,8 @@ Content model — three lists, three single documents, one shared image type:
 - `aboutPage` — owner portrait, `ownerStory[]`, statement, milestones,
   principles.
 - `siteSettings` — name, owner, phone, WhatsApp, email, address, hours,
-  establishedYear, projectsCompleted, credential, serviceAreas, optional
-  `mapsUrl`.
+  establishedYear, projectsCompleted, serviceAreas, optional `mapsUrl`. There
+  is no `credential` field any more — see **PVC division — no distributorship**.
 - `photo` — the image type every photograph field uses: hotspot on, **alt
   text required**, and an async rule that rejects anything under 1200px on
   the long side, quoting the dimensions.
@@ -481,8 +521,9 @@ Modern, minimalist, professional — and the design must not cost speed.
 ### Copy rules paid for once
 
 - **Never `.toLowerCase()` a division title or category label.** They are
-  proper nouns with real casing — "PVC — KDM Profile" comes out as
-  "pvc — kdm profile", which shipped to three pages before it was caught.
+  proper nouns with real casing — "PVC Profile" comes out as "pvc profile",
+  and the earlier "PVC — KDM Profile" shipped as "pvc — kdm profile" to three
+  pages before it was caught.
   Write sentences that take the label as-is.
 - The big-number strip treatment (`text-3xl font-extrabold`) is for numerals
   only. `/about` originally fed it place names and "Sabarkantha" pushed the
@@ -625,7 +666,9 @@ Not code — with owners:
 - **Citations** (SEO friend): JustDial, IndiaMART, Sulekha, Bing Places, with
   name, address and phone identical everywhere.
 - **Content cadence** (Nilesh): a project a fortnight with the town in it.
-- **Backlinks** (SEO friend): a KDM dealer listing pointing at the site first.
+- **Backlinks** (SEO friend): start from the citation directories above. The
+  KDM dealer listing that was going to be the first link went with the
+  partnership; Nilesh is not a listed dealer for Kaka or Polywood either.
 
 Not doing: town-by-town "doorway" pages. Thin pages per town are a penalty
 risk, and the gallery already ties real towns to real jobs.
@@ -671,6 +714,8 @@ skipped when it is.
       Profile listing.
 - [ ] Sanity webhook (Manage → API → Webhooks) pointed at the host's build
       hook, then publish a test edit and watch the site rebuild.
+- [x] The 13 Sep 2026 Developer token ("aadi-sanity (Robot)", used for the
+      KDM removal and the Studio redeploy) deleted by Divy the same day.
 - [x] The `setup` Developer token deleted in Manage → API → Tokens (6 Sep
       2026). Nothing live uses one.
 - [ ] Nilesh invited to the Sanity project as **Editor** (Manage → Members),

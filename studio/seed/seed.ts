@@ -21,8 +21,22 @@ import { testimonials } from "./data/testimonials";
  *
  * IDs are deterministic (`project-<slug>`, `division-<slug>`, the three
  * singleton names) so a forced re-run replaces documents in place instead of
- * duplicating them, and the homepage's featured references resolve.
+ * duplicating them, and the homepage's featured references resolve. The one
+ * exception is in DIVISION_IDS below.
  */
+
+/**
+ * Divisions whose live document id does not follow `division-<slug>`. The PVC
+ * division was renamed from "PVC — KDM Profile" to "PVC Profile" on
+ * 13 Sep 2026 by patching the document in place, so its id still carries the
+ * old slug. Renaming an id means deleting a referenced document; pinning it
+ * here is cheaper and keeps a forced re-seed from creating a second PVC
+ * division beside the real one.
+ */
+const DIVISION_IDS: Record<string, string> = {
+  "pvc-profile": "division-pvc-kdm-profile",
+};
+const divisionId = (slug: string) => DIVISION_IDS[slug] ?? `division-${slug}`;
 
 const token = process.env.SANITY_AUTH_TOKEN;
 if (!token) {
@@ -99,7 +113,7 @@ function hexToColor(hex: string) {
 }
 
 const divisionDocs = services.map((s, i) => ({
-  _id: `division-${s.slug}`,
+  _id: divisionId(s.slug),
   _type: "division",
   title: s.title,
   short: s.short,
@@ -141,7 +155,7 @@ const projectDocs = projects.map((p) => ({
   _type: "project",
   title: p.title,
   slug: { _type: "slug", current: p.slug },
-  division: { _type: "reference", _ref: `division-${p.category}` },
+  division: { _type: "reference", _ref: divisionId(p.category) },
   location: p.location,
   // "2026-05" in the placeholder data; Sanity's date type wants a full day.
   completedOn: `${p.completedOn}-01`,
@@ -172,7 +186,6 @@ const siteSettingsDoc = {
   hoursShort: site.hoursShort,
   establishedYear: site.establishedYear,
   projectsCompleted: site.projectsCompleted,
-  credential: site.credential,
   serviceAreas: [...site.serviceAreas],
 };
 

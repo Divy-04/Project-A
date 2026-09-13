@@ -1,7 +1,7 @@
 # AADI ENTERPRISE
 
 Marketing site for a fabrication business in Himatnagar, Sabarkantha, Gujarat
-— aluminium and glass, KDM PVC profile, and made-to-measure furniture.
+— aluminium and glass, PVC profile, and made-to-measure furniture.
 
 ```bash
 npm install

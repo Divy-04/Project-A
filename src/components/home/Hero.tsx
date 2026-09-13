@@ -1,18 +1,11 @@
 import { Button } from "@/components/Button";
 import { Photo } from "@/components/Photo";
-import { ArrowIcon, CheckIcon, PhoneIcon } from "@/components/icons";
+import { ArrowIcon, PhoneIcon } from "@/components/icons";
 import { telLink } from "@/lib/links";
 import { getHomePage, getSettings } from "@/sanity/loaders";
 
 export async function Hero() {
   const [site, home] = await Promise.all([getSettings(), getHomePage()]);
-
-  /* "Authorised Distributor — KDM PVC Profile" is set in two weights, split
-     at the dash. If the credential is ever written without one it simply
-     renders whole. */
-  const [credentialLead, credentialName] = site.credential.includes(" — ")
-    ? site.credential.split(" — ")
-    : [site.credential, ""];
 
   return (
     <section className="setout wash-brand relative overflow-hidden bg-ground">
@@ -30,7 +23,7 @@ export async function Hero() {
 
           <p className="mt-6 max-w-lg text-base leading-relaxed text-ink-2 sm:text-[1.0625rem]">
             Three divisions under one workshop — aluminium and glass
-            fabrication, KDM PVC profile, and made-to-measure furniture.
+            fabrication, PVC profile, and made-to-measure furniture.
             All measured, fabricated and expertly installed by our team.
           </p>
 
@@ -49,17 +42,6 @@ export async function Hero() {
               <ArrowIcon className="h-4 w-4" />
             </Button>
           </div>
-
-          <p className="mt-9 inline-flex items-center gap-2.5 rounded-sm border border-brand/25 bg-brand-tint px-3 py-2 text-sm font-semibold text-brand-ink">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-white shadow-sm">
-              <CheckIcon className="h-3.5 w-3.5" />
-            </span>
-            <span>
-              {credentialLead}
-              {credentialName && " —"}
-            </span>
-            {credentialName && <span className="text-ink">{credentialName}</span>}
-          </p>
         </div>
 
         {/* Asymmetric image pair. Ratios here are final — the photographs from

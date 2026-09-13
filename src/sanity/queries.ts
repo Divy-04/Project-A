@@ -16,7 +16,6 @@ const IMAGE = /* groq */ `{
 }`;
 
 const DIVISION_REF = /* groq */ `{
-  _id,
   title,
   short,
   tone,
@@ -42,7 +41,6 @@ export const projectsQuery = /* groq */ `
 
 export const divisionsQuery = /* groq */ `
   *[_type == "division" && defined(slug.current)] | order(order asc, title asc) {
-    _id,
     title,
     short,
     tone,
@@ -80,7 +78,6 @@ export const settingsQuery = /* groq */ `
     hoursShort,
     establishedYear,
     projectsCompleted,
-    credential,
     "serviceAreas": coalesce(serviceAreas, []),
     mapsUrl
   }

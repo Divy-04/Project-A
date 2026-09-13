@@ -30,7 +30,6 @@ export type SiteImage = {
 };
 
 export type DivisionRef = {
-  _id: string;
   slug: string;
   title: string;
   short: string;
@@ -90,7 +89,6 @@ export type SiteSettings = {
   hoursShort: string;
   establishedYear: number;
   projectsCompleted: number;
-  credential: string;
   serviceAreas: string[];
   /** Optional override — the Google Business Profile listing, once it exists. */
   mapsUrl: string | null;
