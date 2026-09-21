@@ -63,13 +63,13 @@ Every page is statically prerendered. The only server-side code is
 | --- | --- | --- |
 | `/` | Static | `src/app/page.tsx` |
 | `/gallery` | Static | `src/app/gallery/page.tsx` |
-| `/gallery/[slug]` | SSG × 9 | `generateStaticParams` from `projects.ts` |
-| `/services/[slug]` | SSG × 3 | `generateStaticParams` from `services.ts` |
+| `/gallery/[slug]` | SSG × 9 | `generateStaticParams` from `getProjects()` (Sanity) |
+| `/services/[slug]` | SSG × 3 | `generateStaticParams` from `getDivisions()` (Sanity) |
 | `/about` | Static | `src/app/about/page.tsx` |
 | `/contact` | Static | `src/app/contact/page.tsx` |
 | `/sitemap.xml` | Static | `src/app/sitemap.ts` |
 | `/robots.txt` | Static | `src/app/robots.ts` |
-| `/api/enquiry` | Dynamic | Telegram relay — see below |
+| `/api/enquiry` | Dynamic | Emails the enquiry via Brevo — see below |
 
 Navigation is **Home · Our Work · About · Contact**, defined once in
 `src/data/nav.ts` and reused by the header, the footer and the mobile tab bar.
@@ -87,25 +87,37 @@ mention in passing.
 
 ## Data
 
-All content is hard-coded in `src/data/`, shaped deliberately to mirror the
-future Sanity documents one-for-one, so wiring the CMS is a swap rather than a
-rewrite.
+Content lives in **Sanity** — project `hhvsb0rp`, dataset `production`,
+public. The site reads published documents anonymously at build time through
+`src/sanity/client.ts`; the GROQ is in `queries.ts`, the shapes in `types.ts`,
+and pages call the cached loaders in `loaders.ts` (`getSettings`,
+`getDivisions`, `getProjects`, `getHomePage`, `getAboutPage`,
+`getTestimonials`). No Sanity credential exists in the app or on the host.
 
-| File | Mirrors | Holds |
+| Document | Count | Holds |
 | --- | --- | --- |
-| `site.ts` | `siteSettings` singleton | NAP, hours, service areas, credential, URL |
-| `services.ts` | `service` × 3 | Copy, scope, finish swatches, specs, FAQs |
-| `projects.ts` | `project` × 9 | Title, division, town, date, summary, photo count |
-| `story.ts` | `aboutPage` singleton | Owner narrative, milestones, principles |
-| `testimonials.ts` | `testimonial` × 3 | Placeholder quotes |
-| `nav.ts` | — | Primary navigation: href, full label, tab caption, icon key |
+| `siteSettings` | 1 | NAP, hours, service areas, established year, project count, Maps link |
+| `division` | 3 | Copy, scope items, finish swatches, specs, FAQs, tone |
+| `project` | 9 | Title, division, town, completed month, summary, images |
+| `homePage` | 1 | Hero slots, before/after, where-we-work photo, featured projects |
+| `aboutPage` | 1 | Owner portrait and story, statement, milestones, principles |
+| `testimonial` | 3 | Placeholder quotes |
 
-`projects.ts` holds **three per division on purpose.** The reference photos the
-client supplied skewed heavily to furniture, and an unbalanced gallery is the
-most visible way that tilt gets back into the site.
+The Studio is its own package in `studio/` and is hosted at
+https://aadi-enterprise.sanity.studio — see `studio/README.md`. The old
+`src/data/*.ts` content files are now `studio/seed/data/`, the seed's input
+only. `src/data/nav.ts` stays in the app: navigation is structure, not content.
 
-Values marked `TBC` in `site.ts` and `services.ts` are drafts awaiting the
-client's confirmation. See *Before launch* below.
+The seed keeps **three projects per division on purpose.** The reference
+photos the client supplied skewed heavily to furniture, and an unbalanced
+gallery is the most visible way that tilt gets back into the site.
+
+Values marked `TBC` in Site settings, and every `specs` value on the three
+Division documents, are drafts awaiting the client's confirmation. See *Before
+launch* below.
+
+A publish changes nothing on the live site until the Sanity webhook is pointed
+at the host's build hook — that is wired at deployment.
 
 ---
 
@@ -117,7 +129,9 @@ client's confirmation. See *Before launch* below.
 `SectionHead`, `Breadcrumbs`, `Button`, `Wordmark`, `icons`.
 
 **Content** — `ProjectCard`, `ProjectIndex`, `GalleryBrowser`, `Swatches`,
-`SpecList`, `Faqs`, `EnquiryForm`, `CtaBand`, `Placeholder`, `FooterMap`.
+`SpecList`, `Faqs`, `EnquiryForm`, `CtaBand`, `Photo` (a Sanity image with
+`srcset`, or the `Placeholder` in the same footprint), `Placeholder`,
+`FooterMap`, `ComparisonSlider`.
 
 **Decoration** — `Backdrop` (line-art elevations and the mark watermark),
 `Marquee`, `CountUp`, `ScrollRig` + `home/scenes` (the scroll-driven section).
@@ -167,30 +181,36 @@ Non-negotiable, because ranking is the point of the site.
 3. **Zero CLS.** All geometry lives in base CSS; JavaScript only ever writes
    custom properties. Measured 0.000 on every page.
 4. **One `h1` per page**, no skipped heading levels.
-5. **Canonicals, sitemap, robots and JSON-LD** all build off `site.url`.
+5. **Canonicals, sitemap, robots and JSON-LD** all build off `siteUrl` in
+   `src/lib/site-url.ts` (`NEXT_PUBLIC_SITE_URL`, falling back to a
+   hard-coded origin).
 
 ---
 
 ## Enquiry form
 
-`/contact` posts to `src/app/api/enquiry/route.ts`, which relays to Telegram.
+`/contact` posts to `src/app/api/enquiry/route.ts`, which sends one email per
+enquiry through **Brevo** (free plan, 300/day) to the business Gmail. It was
+Telegram until 6 Sep 2026; the client chose email.
 
-The bot token must never reach the browser — calling `api.telegram.org`
-directly from the form would put it in the page source and let anyone take the
-bot over. That is the entire reason this endpoint exists.
+The API key must never reach the browser — calling Brevo directly from the
+form would put it in the page source and let anyone send 300 emails a day as
+us. That is the entire reason this endpoint exists; it is the only server-side
+code on the site.
 
-Configure via `.env.local` (see `.env.example`):
+Configure via `.env.local` (see `.env.example` for the steps):
 
 ```
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
+BREVO_API_KEY=
+ENQUIRY_FROM=      # a sender verified in Brevo
+ENQUIRY_TO=        # the business Gmail
 NEXT_PUBLIC_SITE_URL=
 ```
 
-With either Telegram value missing the endpoint returns 503 and the form says
-"not connected yet" and points at the phone. **That is the expected state
-right now** — the bot is scheduled for the Sanity pass. It never shows a
-thank-you for a message that went nowhere.
+With any of the three missing the endpoint returns 503 and the form says
+"not connected yet" and points at the phone. It never shows a thank-you for a
+message that went nowhere. Wired and tested 6 Sep 2026 on the developer's
+Brevo account; the sender moves to the real domain at deployment.
 
 Call and WhatsApp are the primary actions and work with no JavaScript.
 
@@ -226,28 +246,78 @@ value that is already correct in the HTML.
 
 ---
 
+## Where it stands (21 Sep 2026)
+
+Design approved. Sanity and the Brevo enquiry form are built, tested and
+pushed (last commit `5828ea6`, 13 Sep 2026, which also removed the ended KDM
+distributorship — the division is now "PVC Profile"). **Deployment has not
+started.** The full plan, with the order decided on 13 Sep, is in `CLAUDE.md`
+under *Deployment plan*; the short version:
+
+1. Cloudflare Workers via the OpenNext adapter, on workers.dev first.
+2. Sanity webhook → the Worker's Deploy Hook.
+3. One call with Nilesh: he buys `aadienterprise.in` at an Indian registrar,
+   nameservers to Cloudflare, domain attached; TBC values collected on the
+   same call.
+4. After go-live: the SEO pass, Search Console, Google Business Profile.
+
+## Picking this up on another machine
+
+Nothing sensitive is in the repo, so a clone plus one env file is enough.
+
+```bash
+git clone https://github.com/Divy-04/Project-A.git aadi   # push as Divy-04 only
+cd aadi
+npm install
+cp .env.example .env.local        # fill BREVO_API_KEY, ENQUIRY_FROM, ENQUIRY_TO
+npm run dev                        # http://localhost:3000
+npm run build                      # every route must still say ○ (Static)
+```
+
+- The Brevo values are not in git. Copy them from the old laptop's
+  `.env.local`, or regenerate the key in Brevo (Account → SMTP & API). Without
+  them everything works except the form, which says "not connected yet".
+- **No Sanity token is needed** to develop or build — the dataset is public.
+  Only `npm run studio:deploy` and `npm run seed` need one, and both tokens
+  ever created have been deleted; make a fresh Developer token at
+  sanity.io/manage → API → Tokens for that job and delete it after.
+- The Studio has its own dependencies: `cd studio && npm install` before
+  `npm run studio` from the root.
+- Lint with `npx eslint src --ext .ts,.tsx` — `next lint` no longer exists.
+- Review on a 1536×766 viewport for desktop checks; that is what the client
+  has been shown on.
+
 ## Before launch
 
-Nothing here is urgent — deployment is the last phase — but none of it may be
-skipped.
+Nothing here may be skipped. The same list, with owners, is in `CLAUDE.md`
+under *Before it can go live*.
 
-- [ ] `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` set on the host; send a real
-      test enquiry and confirm it arrives
-- [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain
-- [ ] Every `specs` value in `services.ts` confirmed by Nilesh — they are
-      drafts, and a wrong section size in print is worse than none
-- [ ] All `TBC` values in `site.ts` confirmed
-- [ ] `story.ts` milestone years confirmed — they are inferred, not recorded
+- [ ] `BREVO_API_KEY`, `ENQUIRY_FROM`, `ENQUIRY_TO` set on the Worker; send a
+      real test enquiry and confirm it arrives in the business Gmail
+- [ ] `NEXT_PUBLIC_SITE_URL` set to `https://aadienterprise.in`; the code
+      fallback in `src/lib/site-url.ts` and `.env.example` switched from `.com`
+- [ ] Every `specs` value on the three Division documents confirmed by Nilesh —
+      they are drafts, and a wrong section size in print is worse than none
+- [ ] All `TBC` values in Site settings confirmed
+- [ ] About page milestone years confirmed — they are inferred, not recorded
 - [ ] Real testimonials replacing the placeholders
-- [ ] `mapsUrl` pointed at the Google Business Profile listing
+- [ ] Maps link in Site settings pointed at the Google Business Profile listing
 - [ ] Real photographs
+- [ ] Sanity webhook pointed at the Worker's Deploy Hook and a test publish
+      seen to rebuild
+- [ ] Nilesh invited to Sanity as Editor and shown the Studio once
 
-## Open decisions
+## Decisions
 
-- **Domain.** `site.url` is a guess.
-- **Hosting.** Vercel Hobby's terms exclude commercial use, so it is
-  Cloudflare Pages, Netlify or Vercel Pro. The site has one server function,
-  so a pure static-file host is out.
+- **Domain: `aadienterprise.in`** (6 Sep). Not yet bought; Nilesh buys it
+  under his own email on the domain call. Cloudflare Registrar does not sell
+  `.in`, so an Indian registrar with nameservers moved to Cloudflare.
+- **Hosting: Cloudflare Workers** via `@opennextjs/cloudflare` (6 Sep; order
+  fixed 13 Sep). The Pages adapter is frozen without Next 16 support. Account
+  in Nilesh's name with Divy as a member; GitHub connection stays Divy-04.
+  Free tier verified 13 Sep — figures in `CLAUDE.md`.
+- **Enquiries: email via Brevo**, not Telegram (6 Sep).
 - **First-load JS is ~173 KB gzipped**, of which ~150 KB is the React 19 and
   App Router runtime. Next was chosen for an embedded Sanity Studio; that
-  reason evaporated once Sanity started hosting the Studio itself.
+  reason evaporated once Sanity started hosting the Studio itself. Not
+  re-opened; switching would mean rebuilding what exists.

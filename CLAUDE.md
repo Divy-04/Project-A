@@ -32,8 +32,11 @@ not started.
 the site, the dataset and the Studio — see **PVC division — no
 distributorship** below.
 
-**Next:** an SEO pass on 7 Sep 2026 (see **SEO pass** below), then deployment
-to Cloudflare under **aadienterprise.in** — domain decided, not yet bought.
+**Where it stands (21 Sep 2026):** nothing has changed in the repo since the
+13 Sep commit (`5828ea6`, pushed). Step 3 is next and the order was decided on
+13 Sep — see **Deployment plan** below. The SEO pass that was scheduled for
+7 Sep did **not** happen and now comes after go-live. To continue on another
+machine, start at **Picking this up on another machine** in `SYSTEM.md`.
 
 Because deployment comes last, the enquiry form being unconfigured during
 step 1 costs nothing: the site is not public, so there is no real enquiry to
@@ -623,13 +626,53 @@ a scroll fraction — the pin's height offsets the mapping:
 y = trackTop + pinHeight + i*stepHeight + within*stepHeight - 0.72*viewportHeight
 ```
 
-## SEO pass — scheduled 7 Sep 2026
+## Deployment plan — decided 13 Sep 2026
+
+Order, agreed with Divy on 13 Sep:
+
+1. **Deploy to Cloudflare Workers first, on the workers.dev address.** Use
+   Cloudflare's OpenNext adapter (`@opennextjs/cloudflare`) — the old Pages
+   adapter is frozen and has no Next 16 support. Connect the GitHub repo
+   (Divy-04/Project-A, main) through Workers Builds so a push deploys. Set
+   `BREVO_API_KEY`, `ENQUIRY_FROM`, `ENQUIRY_TO` as secrets and
+   `NEXT_PUBLIC_SITE_URL` as a build variable. Confirm all 18 sitemap routes
+   plus robots serve, and that `/api/enquiry` sends on the Workers runtime.
+   Verify the adapter steps against Cloudflare's current docs — this area
+   changes often.
+2. **Wire the Sanity webhook** to the Worker's Deploy Hook URL (Workers Builds
+   has had Deploy Hooks since Apr 2026). Publish a test edit, watch it rebuild.
+3. **One call with Nilesh, then the domain.** On the call: he buys
+   **aadienterprise.in** under his own email at an Indian registrar
+   (Cloudflare Registrar does not sell `.in` — checked 13 Sep), points its
+   nameservers at Cloudflare, and the domain is attached to the Worker. Ask
+   him the TBC values on the same call — specs, hours, milestone years,
+   WhatsApp number, PIN, towns — before the domain goes on. Then switch the
+   `siteUrl` fallback and `.env.example` to `.in`, move the Brevo sender to
+   the domain via DNS, send a real test enquiry, and have him mark it not-spam.
+4. **After go-live:** the SEO pass below, Search Console (DNS verification at
+   Cloudflare, submit the sitemap), Google Business Profile.
+
+Accounts: the Cloudflare account and the registrar are to be **Nilesh's
+email, with Divy added as a member**. The GitHub connection stays Divy-04
+(never the divyp04 work account). Nilesh is invited to Sanity as Editor.
+
+Cloudflare free tier, verified 13 Sep 2026: Workers Free is 100k requests/day
+and 10 ms CPU per request; static asset requests are free and unlimited;
+over-limit requests fail rather than bill. Worker size limit is 64 MiB
+uncompressed on every plan (the 3 MiB compressed cap was removed 4 Sep 2026).
+Workers Builds gives 3,000 build minutes a month. The site's only server code
+is `/api/enquiry`; everything else is a static asset, so the free tier is
+ample.
+
+## SEO pass — after go-live (was scheduled 7 Sep 2026)
 
 The site's job is to be found. The structural half is done: static HTML, real
 copy, canonicals, sitemap, robots, LocalBusiness + BreadcrumbList JSON-LD, alt
 text enforced in the Studio, no CLS, a page per project. This pass finishes the
-on-page and technical half before the first push to Cloudflare. The SEO friend
-does off-site; the job here is handing over a site that does not hold them back.
+on-page and technical half. It was scheduled for 7 Sep and did not run; on
+13 Sep it was moved to after the first deploy so the workers.dev push is not
+held up. Same list, same order. The SEO friend does off-site; the job here is
+handing over a site that does not hold them back.
 
 In code, in this order:
 
@@ -699,6 +742,11 @@ skipped when it is.
       regenerating the key first — the setup one was photographed.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
       robots.txt and the LocalBusiness JSON-LD all build off it.
+- [ ] Cloudflare account and the `.in` registrar under **Nilesh's email**, Divy
+      added as a member. Nameservers moved to Cloudflare, domain attached to
+      the Worker.
+- [ ] Brevo sender moved from the developer's Gmail to the real domain (DNS
+      verification in Brevo), so the From line carries the business.
 - [ ] Every `specs` value on the three **Division** documents confirmed by
       Nilesh. They are my drafts. Publishing a wrong section size or lead time
       is worse than publishing none.
@@ -723,9 +771,9 @@ skipped when it is.
 
 ## Open — needs a decision
 
-- **The real domain — decided 6 Sep: aadienterprise.in**, to be bought. Until
-  the SEO pass switches it, `siteUrl` in `src/lib/site-url.ts` still falls back
-  to the old `.com` guess. Canonical URLs, the sitemap, robots.txt and the
+- **The real domain — decided 6 Sep: aadienterprise.in**, to be bought by
+  Nilesh on the domain call (see **Deployment plan**). Until then `siteUrl` in
+  `src/lib/site-url.ts` still falls back to the old `.com` guess. Canonical URLs, the sitemap, robots.txt and the
   LocalBusiness JSON-LD all build off it. Overridable at build time with
   `NEXT_PUBLIC_SITE_URL`, which is what the host will set.
 - **Hosting — decided 6 Sep: Cloudflare.** Two things to know. The old
@@ -736,6 +784,7 @@ skipped when it is.
   there, so the local PNGs must be pre-compressed and served plain (the SEO
   pass does this; the Sanity photographs already bypass it). Verify both
   against Cloudflare's current docs at deploy time — this area changes often.
+  The order of operations is in **Deployment plan** above.
 - **First-load JS is 173 KB gzipped**, of which ~150 KB is the React 19 +
   App Router runtime. I told the client to expect under 100 KB earlier and that
   was wrong. Worth flagging: the original reason for choosing Next was an

@@ -18,11 +18,16 @@ statically prerendered.
 | [`SYSTEM.md`](SYSTEM.md) | The map — routes, data model, components, environment, what is outstanding |
 | [`CLAUDE.md`](CLAUDE.md) | The reasoning — why things are built this way and what must not be broken |
 | [`.env.example`](.env.example) | Environment variables, with setup steps |
+| [`studio/README.md`](studio/README.md) | The Sanity Studio — schema, commands, deploying |
 
-## Status
+## Status (21 Sep 2026)
 
-Design phase. All pages are built; Sanity, the Telegram credentials for the
-enquiry form, real photographs and deployment all come after client approval.
+Design approved. Content is in Sanity (Studio at
+https://aadi-enterprise.sanity.studio) and the enquiry form emails via Brevo.
+**Deployment to Cloudflare Workers is the next step** and has not started —
+see *Where it stands* and *Picking this up on another machine* in
+`SYSTEM.md`, and *Deployment plan* in `CLAUDE.md`.
 
-The enquiry form returning "not connected yet" is expected until the Telegram
-bot is configured — see `SYSTEM.md`.
+The enquiry form says "not connected yet" until `.env.local` carries the three
+Brevo values from `.env.example`. Real photographs, real testimonials and the
+client's TBC values are still outstanding.
