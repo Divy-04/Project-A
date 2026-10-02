@@ -19,7 +19,6 @@ export const site = {
     district: "Sabarkantha",
     state: "Gujarat",
     postalCode: "383001", // TBC
-    country: "India",
   },
 
   hours: "Monday – Saturday, 9:00 am – 8:00 pm", // TBC

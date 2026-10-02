@@ -704,6 +704,16 @@ Profile inside the SEO pass. Each step waits on the one before it.
    edit, watch it go live. Each deploy is built from whatever Sanity held at
    that moment, so until the webhook exists a publish changes nothing on the
    site. With it, publish → live is automatic and takes one to two minutes.
+   **Step 2 done, 2 Oct.** Deploy hook `sanity-publish` (Worker → Settings →
+   Builds → Deploy Hooks, branch main) and a Sanity webhook "Rebuild site on
+   publish" (create/update/delete, `production`, drafts off). Tested: hours
+   set to TEST and published → live; set back and published → live again,
+   with nothing touched in Cloudflare. The hook URL is a credential — it lives
+   only in the Sanity webhook, never in the repo. The same publish removed a
+   stray `address.country` that the seed had written but the schema never
+   declared (the Studio flagged it "unknown field"); the seed no longer
+   writes it.
+
    **The `prebuild` script is load-bearing — do not remove it.** Next stores
    every Sanity response from the build in `.next/cache/fetch-cache` with a
    one-year revalidate, and Workers Builds restores `.next/cache` between
@@ -847,10 +857,9 @@ placeholders), everything that was marked `TBC`:
 
 Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 
-- [ ] `BREVO_API_KEY`, `ENQUIRY_FROM` and `ENQUIRY_TO` set on the host (steps
-      in `.env.example`). Send a real test enquiry and confirm it arrives in
-      the business Gmail; have Nilesh mark the first one "not spam". Consider
-      regenerating the key first — the setup one was photographed.
+- [x] `BREVO_API_KEY`, `ENQUIRY_FROM` and `ENQUIRY_TO` set on the Worker as
+      Secrets; a real test enquiry from the live form arrived in the business
+      Gmail inbox (2 Oct 2026). Repeat once the sender moves to the domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
       robots.txt and the LocalBusiness JSON-LD all build off it.
 - [ ] Cloudflare account on **Divy's email**; `aadienterprise.in` bought on
@@ -872,8 +881,8 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 - [ ] Real testimonials replacing the placeholder quotes.
 - [ ] **Google Maps link** in Site settings pointed at the Google Business
       Profile listing.
-- [ ] Sanity webhook (Manage → API → Webhooks) pointed at the host's build
-      hook, then publish a test edit and watch the site rebuild.
+- [x] Sanity webhook (Manage → API → Webhooks) pointed at the Worker's
+      deploy hook; a test publish rebuilt the live site (2 Oct 2026).
 - [x] The 13 Sep 2026 Developer token ("aadi-sanity (Robot)", used for the
       KDM removal and the Studio redeploy) deleted by Divy the same day.
 - [x] The `setup` Developer token deleted in Manage → API → Tokens (6 Sep
