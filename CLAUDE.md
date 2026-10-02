@@ -38,6 +38,11 @@ distributorship** below.
 7 Sep did **not** happen and now comes after go-live. To continue on another
 machine, start at **Picking this up on another machine** in `SYSTEM.md`.
 
+**2 Oct 2026:** the repo was re-cloned into D:\AADI. The deployment order was
+revised with Divy — Cloudflare on Divy's email, the domain bought on Nilesh's
+account, the Business Profile moved to the very end — see **Deployment plan**.
+Step 3 starts now, with the Cloudflare account.
+
 Because deployment comes last, the enquiry form being unconfigured during
 step 1 costs nothing: the site is not public, so there is no real enquiry to
 lose. It must be wired in step 2 regardless — it cannot ship disconnected.
@@ -454,8 +459,10 @@ to it honouring the editor's hotspot. Width and height attributes reserve the
 box; the asset's LQIP paints underneath while it loads. Why not `next/image`:
 the CDN already resizes, a custom `loader` cannot be passed from a server
 component, and a plain `<img>` keeps photographs working on a host with no
-image service. `ComparisonSlider` is the exception — it keeps `next/image`
-for the local PNG fallbacks and sets `unoptimized` for CDN URLs.
+image service. The few `next/image` uses left (`Wordmark`, `HowItWorks`,
+`ComparisonSlider`) render plain too: `images.unoptimized` is set globally
+because Cloudflare Workers has no Next image optimiser, and the files in
+`public/images/process` are pre-compressed WebP sized for their slot.
 
 **Words stay in code.** Section headings, hero copy, the FAQ on /contact, the
 process illustrations and the logo were written for the layout. The Studio
@@ -626,34 +633,91 @@ a scroll fraction — the pin's height offsets the mapping:
 y = trackTop + pinHeight + i*stepHeight + within*stepHeight - 0.72*viewportHeight
 ```
 
-## Deployment plan — decided 13 Sep 2026
+## Deployment plan — revised 2 Oct 2026
 
-Order, agreed with Divy on 13 Sep:
+Agreed with Divy on 2 Oct. It replaces the 13 Sep order, which had Cloudflare
+on Nilesh's email, Nilesh buying the domain on a call, and the Business
+Profile inside the SEO pass. Each step waits on the one before it.
 
-1. **Deploy to Cloudflare Workers first, on the workers.dev address.** Use
-   Cloudflare's OpenNext adapter (`@opennextjs/cloudflare`) — the old Pages
-   adapter is frozen and has no Next 16 support. Connect the GitHub repo
-   (Divy-04/Project-A, main) through Workers Builds so a push deploys. Set
-   `BREVO_API_KEY`, `ENQUIRY_FROM`, `ENQUIRY_TO` as secrets and
-   `NEXT_PUBLIC_SITE_URL` as a build variable. Confirm all 18 sitemap routes
-   plus robots serve, and that `/api/enquiry` sends on the Workers runtime.
-   Verify the adapter steps against Cloudflare's current docs — this area
-   changes often.
-2. **Wire the Sanity webhook** to the Worker's Deploy Hook URL (Workers Builds
-   has had Deploy Hooks since Apr 2026). Publish a test edit, watch it rebuild.
-3. **One call with Nilesh, then the domain.** On the call: he buys
-   **aadienterprise.in** under his own email at an Indian registrar
-   (Cloudflare Registrar does not sell `.in` — checked 13 Sep), points its
-   nameservers at Cloudflare, and the domain is attached to the Worker. Ask
-   him the TBC values on the same call — specs, hours, milestone years,
-   WhatsApp number, PIN, towns — before the domain goes on. Then switch the
-   `siteUrl` fallback and `.env.example` to `.in`, move the Brevo sender to
-   the domain via DNS, send a real test enquiry, and have him mark it not-spam.
-4. **After go-live:** the SEO pass below, Search Console (DNS verification at
-   Cloudflare, submit the sitemap), Google Business Profile.
+1. **Cloudflare account, then deploy to workers.dev.** The account is on
+   **Divy's personal email**. Use Cloudflare's OpenNext adapter
+   (`@opennextjs/cloudflare`) — the old Pages adapter is frozen and has no
+   Next 16 support. Connect the GitHub repo (Divy-04/Project-A, main) through
+   Workers Builds so a push deploys. Set `BREVO_API_KEY`, `ENQUIRY_FROM`,
+   `ENQUIRY_TO` as secrets and `NEXT_PUBLIC_SITE_URL` as a build variable.
+   Confirm all 18 sitemap routes plus robots serve, and that `/api/enquiry`
+   sends on the Workers runtime. Verify the adapter steps against
+   Cloudflare's current docs — this area changes often.
 
-Accounts: the Cloudflare account and the registrar are to be **Nilesh's
-email, with Divy added as a member**. The GitHub connection stays Divy-04
+   **Adapter in place, 2 Oct.** Cloudflare's Next.js guide now leads with
+   vinext; it is beta and was reported to render pages on first request
+   rather than at build, so OpenNext stays (it supports every Next 16
+   release). What is in the repo:
+   - Next **16.3.8** — 16.3.0 carried critical advisories (RCE in the image
+     optimiser and in `next/og`), and the adapter needs ≥16.3.6 anyway.
+   - `wrangler.jsonc` (Worker `aadi-enterprise`) and `open-next.config.ts`
+     with the **static-assets incremental cache**: pages are read back from
+     build output, so no R2 bucket and no `IMAGES` binding, unlike the
+     adapter's template. It cannot revalidate; nothing asks it to.
+   - `npm run preview | deploy | upload`, `public/_headers` for immutable
+     `/_next/static`, `.open-next`/`.wrangler`/`.dev.vars` gitignored.
+   - No `initOpenNextCloudflareForDev()` in `next.config.ts`: it only exposes
+     bindings to `next dev`, and the site uses none.
+   - **Deploy only through Workers Builds, never `npm run deploy` from a
+     laptop.** The adapter bundles `.env`, `.env.production` and `.env.local`
+     into the Worker at build time, so a local deploy would bake the Brevo
+     key into the script. The build server has no `.env.local`.
+   - `opennextjs-cloudflare build` succeeds on Windows; `preview` does not —
+     `workerd` dies with `write EOF`, the Windows gap OpenNext warns about.
+     Runtime checks therefore happen on the workers.dev deploy.
+2. **Sanity webhook, before any content goes in.** Point it at the Worker's
+   Deploy Hook (Workers Builds has had them since Apr 2026), publish a test
+   edit, watch it go live. Each deploy is built from whatever Sanity held at
+   that moment, so until the webhook exists a publish changes nothing on the
+   site. With it, publish → live is automatic and takes one to two minutes.
+   Instant-on-reload (on-demand revalidation) was considered and rejected on
+   2 Oct: it needs a cache store on Cloudflare plus new server code, the free
+   plan's 10 ms CPU per request is tight for rendering pages on the fly, and a
+   project a fortnight does not need it.
+3. **Real content in the Studio**, entered by Divy. Everything in the dataset
+   is still seed placeholder, and none of it may be when the domain goes on —
+   from then Google indexes it.
+   - The 9 projects are dummy copy written for design review. Replace or
+     delete them, keeping the divisions roughly balanced. A featured project
+     cannot be deleted until it is taken out of Home page → Featured projects
+     (a strong reference).
+   - Testimonials: real ones, or delete them. `Testimonials.tsx` returns
+     `null` on an empty list, so the homepage needs no code change.
+   - Specs, About milestone years and every `TBC` in Site settings confirmed
+     by Nilesh — see **Before it can go live**.
+   - Photos: alt text is required and the long side must be ≥1200px. Alt text
+     says what is in the photo, with the town where it fits naturally.
+4. **Domain.** Divy buys **aadienterprise.in** signed in to **Nilesh's
+   account** at an Indian registrar (Cloudflare Registrar does not sell `.in`
+   — checked 13 Sep), registrant in Nilesh's name and address — it is his
+   business's asset. Nameservers to Cloudflare, domain attached to the Worker.
+5. **Switch to the domain.** `NEXT_PUBLIC_SITE_URL` → `https://aadienterprise.in`
+   and redeploy; the `siteUrl` fallback and `.env.example` changed to `.in` in
+   code; the workers.dev route turned off so Google only ever sees one copy.
+6. **Brevo on the domain.** Authenticate aadienterprise.in in Brevo (its DNS
+   records go in at Cloudflare) and change `ENQUIRY_FROM` to
+   `enquiry@aadienterprise.in`. This changes the From line only — enquiries
+   still land in the business Gmail (`ENQUIRY_TO`). If the address should also
+   receive mail, Cloudflare Email Routing forwards it to that Gmail for free.
+   Send a real test enquiry; Nilesh marks it not spam.
+7. **Search Console and the SEO pass in code** — see **SEO pass** below.
+8. **Google Business Profile, last.** Nothing on the site depends on it, and
+   doing it after the site means the name, address, phone and hours are
+   already settled and are copied across exactly. The cost is time:
+   verification (video or postcard) takes days to weeks, and the map pack
+   waits on it. Once verified, paste the listing URL into Site settings →
+   Google Maps link. The SEO pass wires `sameAs` to that same field, so this
+   step needs no code.
+
+Accounts: Cloudflare on **Divy's email**; the domain on **Nilesh's account**,
+so the domain is his and he can point it elsewhere whatever happens to the
+hosting. Sanity, Brevo and Cloudflare all sit in Divy's accounts — Nilesh
+should know that is the arrangement. The GitHub connection stays Divy-04
 (never the divyp04 work account). Nilesh is invited to Sanity as Editor.
 
 Cloudflare free tier, verified 13 Sep 2026: Workers Free is 100k requests/day
@@ -661,8 +725,12 @@ and 10 ms CPU per request; static asset requests are free and unlimited;
 over-limit requests fail rather than bill. Worker size limit is 64 MiB
 uncompressed on every plan (the 3 MiB compressed cap was removed 4 Sep 2026).
 Workers Builds gives 3,000 build minutes a month. The site's only server code
-is `/api/enquiry`; everything else is a static asset, so the free tier is
-ample.
+is `/api/enquiry`, but with OpenNext **every page view is still a Worker
+request** — the prerendered HTML is read back through the Worker, with cache
+interception answering before the Next server loads. Only `/_next/static`,
+fonts and images are free asset requests. 100k page views a day is still
+far beyond this site; confirm CPU per request in Workers Logs after the first
+deploy.
 
 ## SEO pass — after go-live (was scheduled 7 Sep 2026)
 
@@ -671,7 +739,8 @@ copy, canonicals, sitemap, robots, LocalBusiness + BreadcrumbList JSON-LD, alt
 text enforced in the Studio, no CLS, a page per project. This pass finishes the
 on-page and technical half. It was scheduled for 7 Sep and did not run; on
 13 Sep it was moved to after the first deploy so the workers.dev push is not
-held up. Same list, same order. The SEO friend does off-site; the job here is
+held up, and on 2 Oct it became step 7 of the **Deployment plan**, with the
+Business Profile after it. Same list, same order. The SEO friend does off-site; the job here is
 handing over a site that does not hold them back.
 
 In code, in this order:
@@ -686,12 +755,15 @@ In code, in this order:
 4. **Structured data.** `openingHoursSpecification` and `geo` on the business
    record once hours and the pin are confirmed; a `Service` record on each
    division page; `FAQPage` on the division and contact questions; per-project
-   `lastModified` in the sitemap from Sanity's `_updatedAt`.
-5. **Image weight — the biggest item.** The eight PNGs in `public/images/process`
-   are 1.6–1.9 MB each and the slider `priority`-preloads one below the fold.
-   Compress to WebP (roughly a tenth), serve them plain — Cloudflare has no
-   Next image optimiser, and the Sanity photographs already bypass it. Drop
-   the `priority`.
+   `lastModified` in the sitemap from Sanity's `_updatedAt`; `sameAs` on the
+   business record reading Site settings → Google Maps link, so the Business
+   Profile URL arrives in step 8 with no code change.
+5. **Image weight — done 2 Oct 2026, pulled forward into deployment step 1**
+   because Workers has no image optimiser and the 1 MB logo would otherwise
+   ship on every page. The seven PNGs in use became WebP (11.4 MB → 422 KB:
+   process images 1280px, slider 1672px, logo 320px), `images.unoptimized`
+   is on, and the slider no longer preloads. `logo3.png` is unreferenced and
+   was left as it was.
 6. **Completeness.** `lang="en-IN"`, web manifest and touch icons, and
    env-gated hooks for Search Console verification and Cloudflare Web
    Analytics so neither needs a code change later.
@@ -701,9 +773,11 @@ In code, in this order:
 
 Not code — with owners:
 
-- **Google Business Profile** (Nilesh): claim and verify at the Durga Complex
-  address, categories, photos, hours, link to the site. Most of local ranking
-  lives here. Its URL then goes into Site settings → Google Maps link.
+- **Google Business Profile** (Divy, with Nilesh for verification — the last
+  step of the **Deployment plan**): claim and verify at the Durga Complex
+  address, categories, photos, hours, link to the site, details copied exactly
+  from the site. Most of local ranking lives here. Its URL then goes into Site
+  settings → Google Maps link.
 - **Search Console** (Divy, once the domain is live): DNS verification at
   Cloudflare, submit the sitemap.
 - **Citations** (SEO friend): JustDial, IndiaMART, Sulekha, Bing Places, with
@@ -733,8 +807,7 @@ placeholders), everything that was marked `TBC`:
 
 ## Before it can go live
 
-Deployment is step 3, so none of this is urgent yet — but nothing here may be
-skipped when it is.
+Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 
 - [ ] `BREVO_API_KEY`, `ENQUIRY_FROM` and `ENQUIRY_TO` set on the host (steps
       in `.env.example`). Send a real test enquiry and confirm it arrives in
@@ -742,9 +815,10 @@ skipped when it is.
       regenerating the key first — the setup one was photographed.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
       robots.txt and the LocalBusiness JSON-LD all build off it.
-- [ ] Cloudflare account and the `.in` registrar under **Nilesh's email**, Divy
-      added as a member. Nameservers moved to Cloudflare, domain attached to
-      the Worker.
+- [ ] Cloudflare account on **Divy's email**; `aadienterprise.in` bought on
+      **Nilesh's account**, registrant in his name. Nameservers moved to
+      Cloudflare, domain attached to the Worker, workers.dev route turned off.
+- [ ] The 9 placeholder projects replaced with real jobs or deleted.
 - [ ] Brevo sender moved from the developer's Gmail to the real domain (DNS
       verification in Brevo), so the From line carries the business.
 - [ ] Every `specs` value on the three **Division** documents confirmed by
@@ -772,7 +846,7 @@ skipped when it is.
 ## Open — needs a decision
 
 - **The real domain — decided 6 Sep: aadienterprise.in**, to be bought by
-  Nilesh on the domain call (see **Deployment plan**). Until then `siteUrl` in
+  Divy on Nilesh's account (step 4 of the **Deployment plan**). Until then `siteUrl` in
   `src/lib/site-url.ts` still falls back to the old `.com` guess. Canonical URLs, the sitemap, robots.txt and the
   LocalBusiness JSON-LD all build off it. Overridable at build time with
   `NEXT_PUBLIC_SITE_URL`, which is what the host will set.

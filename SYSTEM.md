@@ -251,15 +251,20 @@ value that is already correct in the HTML.
 Design approved. Sanity and the Brevo enquiry form are built, tested and
 pushed (last commit `5828ea6`, 13 Sep 2026, which also removed the ended KDM
 distributorship — the division is now "PVC Profile"). **Deployment has not
-started.** The full plan, with the order decided on 13 Sep, is in `CLAUDE.md`
-under *Deployment plan*; the short version:
+started.** The full plan, revised on 2 Oct 2026, is in `CLAUDE.md` under
+*Deployment plan*; the short version:
 
-1. Cloudflare Workers via the OpenNext adapter, on workers.dev first.
-2. Sanity webhook → the Worker's Deploy Hook.
-3. One call with Nilesh: he buys `aadienterprise.in` at an Indian registrar,
-   nameservers to Cloudflare, domain attached; TBC values collected on the
-   same call.
-4. After go-live: the SEO pass, Search Console, Google Business Profile.
+1. Cloudflare account (Divy's email), then Workers via the OpenNext adapter,
+   on workers.dev first.
+2. Sanity webhook → the Worker's Deploy Hook, before any content goes in.
+3. Real content in the Studio — every project and testimonial is still a
+   placeholder.
+4. `aadienterprise.in` bought on Nilesh's account, nameservers to Cloudflare,
+   domain attached.
+5. Site URL switched to `.in`, workers.dev turned off.
+6. Brevo authenticated on the domain; sender `enquiry@aadienterprise.in`.
+7. Search Console and the SEO pass in code.
+8. Google Business Profile, last.
 
 ## Picking this up on another machine
 
@@ -309,13 +314,14 @@ under *Before it can go live*.
 
 ## Decisions
 
-- **Domain: `aadienterprise.in`** (6 Sep). Not yet bought; Nilesh buys it
-  under his own email on the domain call. Cloudflare Registrar does not sell
-  `.in`, so an Indian registrar with nameservers moved to Cloudflare.
+- **Domain: `aadienterprise.in`** (6 Sep). Not yet bought; Divy buys it on
+  Nilesh's account, registrant in Nilesh's name (2 Oct). Cloudflare Registrar
+  does not sell `.in`, so an Indian registrar with nameservers moved to
+  Cloudflare.
 - **Hosting: Cloudflare Workers** via `@opennextjs/cloudflare` (6 Sep; order
-  fixed 13 Sep). The Pages adapter is frozen without Next 16 support. Account
-  in Nilesh's name with Divy as a member; GitHub connection stays Divy-04.
-  Free tier verified 13 Sep — figures in `CLAUDE.md`.
+  revised 2 Oct). The Pages adapter is frozen without Next 16 support. Account
+  on Divy's email; GitHub connection stays Divy-04. Free tier verified 13 Sep
+  — figures in `CLAUDE.md`.
 - **Enquiries: email via Brevo**, not Telegram (6 Sep).
 - **First-load JS is ~173 KB gzipped**, of which ~150 KB is the React 19 and
   App Router runtime. Next was chosen for an embedded Sanity Studio; that

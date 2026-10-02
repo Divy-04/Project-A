@@ -41,8 +41,8 @@ export default async function HomePage() {
           alt: home.afterImage.alt ?? "Before and after",
         }
       : {
-          before: "/images/process/before.png",
-          after: "/images/process/after.png",
+          before: "/images/process/before.webp",
+          after: "/images/process/after.webp",
           alt: "Process comparison",
         };
 

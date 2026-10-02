@@ -1,0 +1,28 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	// Must match the Worker's name in the Cloudflare dashboard, or Workers
+	// Builds deploys to a second Worker instead of this one.
+	"name": "aadi-enterprise",
+	"compatibility_date": "2026-10-01",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference the OpenNext worker expects; the service name must
+			// match the worker name. See https://opennext.js.org/cloudflare/caching
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "aadi-enterprise"
+		}
+	],
+	// No R2 bucket and no IMAGES binding, unlike the adapter's template. Every
+	// page is built ahead of time and read back from static assets (see
+	// open-next.config.ts), and the local images are pre-compressed and served
+	// as-is (images.unoptimized in next.config.ts).
+	"observability": {
+		"enabled": true
+	}
+}

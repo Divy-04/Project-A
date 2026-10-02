@@ -2,16 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    localPatterns: [
-      {
-        pathname: "/images/**",
-        search: "",
-      },
-      {
-        pathname: "/images/process/logo.png",
-        search: "?v=2",
-      },
-    ],
+    // Cloudflare Workers has no Next image optimiser. The files in
+    // public/images are pre-compressed WebP and served as they are; Sanity
+    // photographs never went through next/image in the first place.
+    unoptimized: true,
   },
 };
 

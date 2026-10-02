@@ -9,28 +9,28 @@ const steps = [
     title: "We measure, at your site",
     note: "Kitchen run · survey",
     body: "We come out, measure the run ourselves and check the wall, the level and the fall. Nothing is taken over the phone, and there is no charge for the visit.",
-    imageSrc: "/images/process/1.png",
+    imageSrc: "/images/process/1.webp",
   },
   {
     kicker: "Fabrication",
     title: "We fabricate, on our own bench",
     note: "Carcass · door · top",
     body: "Cut, mitred and built up part by part in our workshop from the measurements we took — not bought in ready-made and forced to fit.",
-    imageSrc: "/images/process/2.png",
+    imageSrc: "/images/process/2.webp",
   },
   {
     kicker: "In transit",
     title: "We deliver, with our own team",
     note: "Wrapped · en route",
     body: "Wrapped and brought to your site when the work is ready. Nothing is handed to a transporter or a subcontractor along the way.",
-    imageSrc: "/images/process/3.png",
+    imageSrc: "/images/process/3.webp",
   },
   {
     kicker: "Installation",
     title: "We fit, and we finish",
     note: "Seated · sealed · done",
     body: "Seated, levelled, sealed and cleaned up, to the same dimensions we surveyed. If something needs easing later, we come back and ease it.",
-    imageSrc: "/images/process/4.png",
+    imageSrc: "/images/process/4.webp",
   },
 ];
 

@@ -38,7 +38,7 @@ export function Wordmark({
     <span className={`inline-flex items-end gap-1.5 sm:gap-2.5 ${className}`}>
       <span className="relative h-10 w-14 shrink-0 translate-y-1 overflow-hidden rounded-sm sm:h-14 sm:w-20 sm:translate-y-2">
         <Image
-          src="/images/process/logo.png?v=2"
+          src="/images/process/logo.webp"
           alt="AADI Enterprise logo"
           fill
           sizes="80px"
@@ -67,7 +67,7 @@ export function WordmarkStacked({ className = "" }: { className?: string }) {
     <span className={`inline-flex items-end gap-1.5 sm:gap-2.5 ${className}`}>
       <span className="relative h-10 w-14 shrink-0 translate-y-1 overflow-hidden rounded-sm sm:h-14 sm:w-20 sm:translate-y-2">
         <Image
-          src="/images/process/logo.png?v=2"
+          src="/images/process/logo.webp"
           alt="AADI Enterprise logo"
           fill
           sizes="80px"

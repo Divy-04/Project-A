@@ -12,9 +12,9 @@ export function ComparisonSlider({
   alt?: string;
 }) {
   const [position, setPosition] = useState(50);
-  // Sanity CDN images arrive already resized and encoded; only the local
-  // fallbacks in /public go through the Next image optimiser.
-  const remote = (src: string) => src.startsWith("http");
+  // Nothing here is optimised by Next (images.unoptimized): Sanity URLs arrive
+  // resized and encoded by the CDN, and the local fallbacks are pre-compressed
+  // WebP. Below the fold, so neither image is preloaded.
 
   return (
     <section className="shell my-20">
@@ -26,15 +26,12 @@ export function ComparisonSlider({
           alt={`${alt}, after`}
           fill
           className="object-cover"
-          priority
-          unoptimized={remote(afterSrc)}
         />
         <Image
           src={beforeSrc}
           alt={`${alt}, before`}
           fill
           className="object-cover"
-          unoptimized={remote(beforeSrc)}
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         />
         <div
