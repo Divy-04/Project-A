@@ -645,9 +645,38 @@ Profile inside the SEO pass. Each step waits on the one before it.
    Next 16 support. Connect the GitHub repo (Divy-04/Project-A, main) through
    Workers Builds so a push deploys. Set `BREVO_API_KEY`, `ENQUIRY_FROM`,
    `ENQUIRY_TO` as secrets and `NEXT_PUBLIC_SITE_URL` as a build variable.
-   Confirm all 18 sitemap routes plus robots serve, and that `/api/enquiry`
+   Confirm all 16 sitemap pages plus robots serve, and that `/api/enquiry`
    sends on the Workers runtime. Verify the adapter steps against
    Cloudflare's current docs — this area changes often.
+
+   **Step 1 done, 2 Oct** — a real enquiry from the live form arrived in the
+   business Gmail inbox (not spam), sent from the Worker through Brevo.
+
+   **Live on workers.dev, 2 Oct:**
+   https://aadi-enterprise.aadienterprise.workers.dev — Cloudflare account on
+   Divy's Google sign-in, subdomain `aadienterprise`. Workers Builds: build
+   `npx opennextjs-cloudflare build`, deploy `npx opennextjs-cloudflare
+   deploy`, build variable `NEXT_PUBLIC_SITE_URL` = that URL. The three Brevo
+   values go in Settings → Variables & Secrets as type **Secret** — a Text
+   variable set in the dashboard is wiped by the next Git deploy. That is
+   the **top-level** Variables & Secrets section; the "Variables and secrets"
+   inside Settings → **Build** is build-time only, and values put there never
+   reach the running Worker (the route kept answering `not-configured` until
+   they were moved, 2 Oct). Check without sending mail: POST `not-json` to
+   `/api/enquiry` — 503 means the secrets are missing, 400 means they are in. Verified
+   from outside: all 16 sitemap pages 200 with their H1, real copy (340–940
+   words) and a canonical on the workers.dev origin; robots, sitemap and the
+   business JSON-LD on the same origin; nine project links on /gallery; zero
+   "kdm"/"authorised"; WebP images and `/_next/static` (immutable) serve; an
+   unknown path 404s; `/api/enquiry` answers 503 `not-configured` before the
+   secrets exist, so the route runs on Workers. (The sitemap is 16 pages; an
+   older note said 18.)
+
+   Pages go out with Next's `s-maxage=31536000, stale-while-revalidate`.
+   Harmless while Cloudflare does not cache HTML, which is its default —
+   **never add a "Cache Everything" rule on the zone in step 4**, or a
+   publish would rebuild the Worker and the edge would keep serving the old
+   page.
 
    **Adapter in place, 2 Oct.** Cloudflare's Next.js guide now leads with
    vinext; it is beta and was reported to render pages on first request
@@ -675,6 +704,15 @@ Profile inside the SEO pass. Each step waits on the one before it.
    edit, watch it go live. Each deploy is built from whatever Sanity held at
    that moment, so until the webhook exists a publish changes nothing on the
    site. With it, publish → live is automatic and takes one to two minutes.
+   **The `prebuild` script is load-bearing — do not remove it.** Next stores
+   every Sanity response from the build in `.next/cache/fetch-cache` with a
+   one-year revalidate, and Workers Builds restores `.next/cache` between
+   builds. Without the script, every rebuild reused the first build's Sanity
+   answers and a publish never reached the site (found 2 Oct: the deploy hook
+   fired, the build succeeded, the page kept the old hours). `prebuild`
+   deletes only that folder — npm runs it before `npm run build`, which is
+   what `opennextjs-cloudflare build` calls — so the build re-reads Sanity and
+   the rest of the build cache still speeds things up.
    Instant-on-reload (on-demand revalidation) was considered and rejected on
    2 Oct: it needs a cache store on Cloudflare plus new server code, the free
    plan's 10 ms CPU per request is tight for rendering pages on the fly, and a
