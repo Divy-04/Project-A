@@ -112,7 +112,7 @@ export default async function ContactPage() {
                 : {})}
               className={`group flex flex-col rounded-sm border p-7 transition-colors ${
                 channel.primary
-                  ? "border-brand bg-brand text-white hover:bg-brand-dark"
+                  ? "border-brand-ink bg-brand-ink text-white hover:bg-brand-dark"
                   : "border-line bg-surface hover:border-line-strong"
               }`}
             >
@@ -125,7 +125,7 @@ export default async function ContactPage() {
               </span>
               <span
                 className={`eyebrow mt-5 ${
-                  channel.primary ? "text-white/60" : "text-ink-3"
+                  channel.primary ? "text-white" : "text-ink-3"
                 }`}
               >
                 {channel.label}
@@ -139,7 +139,7 @@ export default async function ContactPage() {
               </span>
               <span
                 className={`mt-2 flex-1 text-sm ${
-                  channel.primary ? "text-white/70" : "text-ink-2"
+                  channel.primary ? "text-white" : "text-ink-2"
                 }`}
               >
                 {channel.note}

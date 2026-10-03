@@ -30,7 +30,7 @@ export function Header({
 
     <header className="sticky top-0 z-40 border-b border-line bg-ground/85 backdrop-blur-md">
       <div className="shell flex h-16 items-center justify-between gap-2 md:h-[4.5rem] md:gap-6">
-        <Link href="/" aria-label={`${settings.name} — home`} className="shrink-0">
+        <Link href="/" aria-label={`${settings.name} Aluminium · Glass · PVC · Furniture — home`} className="shrink-0">
           <Wordmark />
         </Link>
 
@@ -59,7 +59,7 @@ export function Header({
 
         <a
           href={tel}
-          aria-label={`Call ${settings.phoneDisplay}`}
+          aria-label={`Get a quote — call ${settings.phoneDisplay}`}
           className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-brand px-2.5 text-xs font-semibold text-white lg:hidden"
         >
           <PhoneIcon className="h-4 w-4" />

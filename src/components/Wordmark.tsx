@@ -47,7 +47,7 @@ export function Wordmark({
       </span>
       <span className="flex flex-col leading-none">
         <span className="text-base font-extrabold tracking-[-0.02em] uppercase sm:text-xl">
-          <span className="text-brand">AADI</span>{" "}
+          <span className="text-brand-ink sm:text-brand">AADI</span>{" "}
           <span className="text-ink">ENTERPRISE</span>
         </span>
         {showTagline && (

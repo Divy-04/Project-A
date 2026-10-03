@@ -62,9 +62,12 @@ export function ProjectCard({
           </div>
 
           <div className="flex flex-1 flex-col p-4 md:p-5">
-            <h3 className="text-[1.0625rem] leading-snug font-bold tracking-[-0.02em] transition-colors group-hover:text-brand">
+            {/* h2, not h3: this variant only appears on /gallery, where the
+                cards sit straight under the page's h1 with no section heading
+                between them, and a skipped level breaks the outline. */}
+            <h2 className="text-[1.0625rem] leading-snug font-bold tracking-[-0.02em] transition-colors group-hover:text-brand">
               {project.title}
-            </h3>
+            </h2>
             <p className="mt-1.5 text-xs text-ink-3">
               {project.location} · {formatCompleted(project.completedOn)}
             </p>
