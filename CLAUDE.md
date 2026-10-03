@@ -926,7 +926,52 @@ blurb, an intro and an item list carrying the researched terms:
   crockery and shoe units, shop counters, mariya.
 
 The token was delivered as a photo, so it was deleted right after.
-**Still to do:** the audit (item 7 below).
+
+### Audit — 3 Oct 2026, live site
+
+Lighthouse 12.8 on the live domain, on five pages: home, PVC, gallery,
+contact, and one project.
+
+| | Performance | Accessibility | Best practices | SEO |
+| --- | --- | --- | --- | --- |
+| Desktop 1536×766 | 92–95 | 100 | 100 | 100 |
+| Mobile (slow 4G emulation) | 77–91 | 96–100 | 100 | 100 |
+
+CLS is 0 everywhere and TBT is ≤150 ms. Desktop LCP is 1.3–1.5 s; mobile
+LCP is 2.9–4.4 s. Performance swings ±10 between runs with network
+conditions — the first run that day scored 71–78 before any change.
+
+Googlebot render (mobile UA, never scrolled), eight pages:
+- one h1 each and zero hidden headings;
+- all 7 project links on /gallery;
+- 210–850 words in `main`;
+- every `<img>` has alt.
+
+Fixes the audit produced:
+- Only the hero lead image is `priority`. Three high-priority preloads were
+  competing for one connection.
+- `preconnect` to cdn.sanity.io.
+- The logo is 160 px wide (12.5 KB → 5 KB).
+- Header accessible names now contain the visible text.
+- Contact's primary card uses white on brand-ink.
+- The 16 px wordmark on phones uses brand-ink.
+- Gallery card titles are h2.
+
+`inlineCss` was tried and rejected: see `next.config.ts`.
+
+What still limits mobile, and is accepted:
+- ~160 KB of React/Next runtime (see "First-load JS" under Open — needs a
+  decision).
+- Cloudflare's free plan serves India from Singapore, so HTML TTFB is about
+  280–300 ms.
+- One informational a11y item: the logo link's tagline is styled uppercase.
+  It has zero weight in the score.
+- Low contrast on the off-screen gallery rail cards. That is the
+  deliberate 45%-opacity slide-in, not a colour fault.
+
+Cloudflare auto-injects its Web Analytics beacon
+(`static.cloudflareinsights.com`), about 10 KB. That comes from the zone's
+Web Analytics setting, not from the code.
 
 The original list, for reference:
 
