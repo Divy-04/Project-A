@@ -344,12 +344,15 @@ for a message that went nowhere. Do not "fix" a 503 by hiding the form, faking
 a success state, or stubbing the endpoint — the visible failure plus the phone
 fallback is the point.
 
-The Brevo account is the developer's (pdivy945@gmail.com), and the sender is
-that address, because a verified sender needs a one-time code from the inbox
-owner and the client was not to hand. Recipients need no verification, so
-enquiries land in the business Gmail regardless. At deployment the sender
-should move to the real domain (Brevo verifies a domain via DNS), which drops
-the developer's address from the From line. The form collects no customer
+The Brevo account is the developer's (pdivy945@gmail.com). Until 3 Oct 2026
+the sender was that address too, because a verified sender needs a one-time
+code from the inbox owner and the client was not to hand. Since then it has
+been **`enquiry@aadienterprise.in`**: the domain is authenticated in Brevo
+with DKIM and DMARC records at Cloudflare, so no inbox code was needed.
+`enquiry@` is send-only and has no mailbox; Cloudflare Email Routing can
+forward it to the business Gmail if it ever needs to receive mail.
+Recipients need no verification, so enquiries land in the business Gmail.
+The form collects no customer
 email, so there is nothing to reply to — the owner rings the number. The
 email is deliberately plain: read on a phone, the number is the one thing
 that has to be tappable.
@@ -780,6 +783,17 @@ Profile inside the SEO pass. Each step waits on the one before it.
    still land in the business Gmail (`ENQUIRY_TO`). If the address should also
    receive mail, Cloudflare Email Routing forwards it to that Gmail for free.
    Send a real test enquiry; Nilesh marks it not spam.
+   **Step 6 done, 3 Oct.** Brevo → Domains → aadienterprise.in, using the
+   **Automatic** setup. Cloudflare showed a one-time consent page and Brevo
+   wrote six DNS-only records: the `brevo-code` TXT on the apex, `_dmarc`
+   (`p=none`, reports to Brevo), the `brevo1`/`brevo2._domainkey` DKIM
+   CNAMEs, and the `r`/`img` branding CNAMEs (unused). The optional branded
+   subdomain was skipped. A sender `enquiry@aadienterprise.in` ("AADI
+   Enterprise website") was added, verified at once because the domain is
+   authenticated, and set as the `ENQUIRY_FROM` Secret on the Worker. A
+   secret change goes live without a build. A real enquiry from the live
+   form arrived in seconds in the business Gmail **inbox**. There are no MX
+   records, so `enquiry@` cannot receive mail.
 7. **Hand over, then the SEO pass in code during Nilesh's week** — see
    **SEO pass** below. Nilesh gets a Sanity Editor invite and one
    walkthrough, and spends about a week correcting the seven projects (their
@@ -905,8 +919,9 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 - [ ] Nilesh adds his own payment method at Hostinger and turns auto-renew
       on; the domain expires around 3 Oct 2028.
 - [ ] The 9 placeholder projects replaced with real jobs or deleted.
-- [ ] Brevo sender moved from the developer's Gmail to the real domain (DNS
-      verification in Brevo), so the From line carries the business.
+- [x] Brevo sender moved from the developer's Gmail to the real domain (DNS
+      verification in Brevo), so the From line carries the business — now
+      `enquiry@aadienterprise.in`, tested to the inbox (3 Oct 2026).
 - [ ] Every `specs` value on the three **Division** documents confirmed by
       Nilesh. They are my drafts. Publishing a wrong section size or lead time
       is worse than publishing none.

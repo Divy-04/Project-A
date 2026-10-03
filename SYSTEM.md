@@ -265,6 +265,7 @@ the short version:
    until Nilesh adds his own payment method; www → apex redirect rule).
 5. Site URL switched to `.in`, workers.dev turned off. **Done 3 Oct 2026.**
 6. Brevo authenticated on the domain; sender `enquiry@aadienterprise.in`.
+   **Done 3 Oct 2026**, test enquiry landed in the inbox.
 7. Hand over to Nilesh; the SEO pass in code during his week of fixing the
    project details.
 8. After that week: Google Business Profile, then Search Console.
