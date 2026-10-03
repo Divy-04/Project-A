@@ -765,6 +765,15 @@ Profile inside the SEO pass. Each step waits on the one before it.
 5. **Switch to the domain.** `NEXT_PUBLIC_SITE_URL` → `https://aadienterprise.in`
    and redeploy; the `siteUrl` fallback and `.env.example` changed to `.in` in
    code; the workers.dev route turned off so Google only ever sees one copy.
+   **Step 5 done, 3 Oct.** Build variable changed, code pushed as `f647552`.
+   That morning Cloudflare had an incident, "Workers Build failing to start":
+   pushes got no build, or one that failed in the same second it started.
+   A dashboard **Retry build** went through once it eased. Verified on the
+   domain: all 14 sitemap pages 200 (7 projects since the two dummies were
+   deleted), every canonical, robots, the sitemap and the JSON-LD on
+   `https://aadienterprise.in`, zero `workers.dev` in the HTML, and the
+   enquiry probe 400. The workers.dev route and Preview URLs are both
+   disabled; the old address now 404s.
 6. **Brevo on the domain.** Authenticate aadienterprise.in in Brevo (its DNS
    records go in at Cloudflare) and change `ENQUIRY_FROM` to
    `enquiry@aadienterprise.in`. This changes the From line only — enquiries
@@ -887,12 +896,12 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 - [x] `BREVO_API_KEY`, `ENQUIRY_FROM` and `ENQUIRY_TO` set on the Worker as
       Secrets; a real test enquiry from the live form arrived in the business
       Gmail inbox (2 Oct 2026). Repeat once the sender moves to the domain.
-- [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
-      robots.txt and the LocalBusiness JSON-LD all build off it.
+- [x] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
+      robots.txt and the LocalBusiness JSON-LD all build off it (3 Oct 2026).
 - [x] Cloudflare account on **Divy's email**; `aadienterprise.in` bought on
       **Nilesh's account**, registrant in his name. Nameservers moved to
       Cloudflare, domain attached to the Worker (3 Oct 2026).
-- [ ] workers.dev route turned off once the canonicals say `.in`.
+- [x] workers.dev route and Preview URLs turned off (3 Oct 2026).
 - [ ] Nilesh adds his own payment method at Hostinger and turns auto-renew
       on; the domain expires around 3 Oct 2028.
 - [ ] The 9 placeholder projects replaced with real jobs or deleted.

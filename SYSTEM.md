@@ -263,7 +263,7 @@ the short version:
 4. `aadienterprise.in` bought on Nilesh's account, nameservers to Cloudflare,
    domain attached. **Done 3 Oct 2026** (Hostinger, 2 years, auto-renew off
    until Nilesh adds his own payment method; www → apex redirect rule).
-5. Site URL switched to `.in`, workers.dev turned off.
+5. Site URL switched to `.in`, workers.dev turned off. **Done 3 Oct 2026.**
 6. Brevo authenticated on the domain; sender `enquiry@aadienterprise.in`.
 7. Hand over to Nilesh; the SEO pass in code during his week of fixing the
    project details.
@@ -302,7 +302,7 @@ under *Before it can go live*.
 
 - [ ] `BREVO_API_KEY`, `ENQUIRY_FROM`, `ENQUIRY_TO` set on the Worker; send a
       real test enquiry and confirm it arrives in the business Gmail
-- [ ] `NEXT_PUBLIC_SITE_URL` set to `https://aadienterprise.in`; the code
+- [x] `NEXT_PUBLIC_SITE_URL` set to `https://aadienterprise.in`; the code
       fallback in `src/lib/site-url.ts` and `.env.example` switched from `.com`
 - [ ] Every `specs` value on the three Division documents confirmed by Nilesh —
       they are drafts, and a wrong section size in print is worse than none
