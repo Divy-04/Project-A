@@ -915,10 +915,18 @@ spam violation.)
   and `NEXT_PUBLIC_CF_ANALYTICS_TOKEN`.
 - The hero copy says "PVC furniture and doors" in place of "PVC profile".
 
-**Still to do:** the Sanity half. The three Division documents get new
-blurbs, intros and item lists with the researched terms, plus a "What is
-mariya work?" FAQ on PVC. It is a patch of the existing documents, and it
-needs a short-lived Editor token. Then the audit (item 7 below).
+**Sanity half, done 3 Oct.** The three Division documents were patched in
+place, not re-seeded, with a short-lived Developer token. Each got a new
+blurb, an intro and an item list carrying the researched terms:
+- Aluminium: sliding and domal windows, aluminium doors, office and glass
+  partitions, aluminium kitchens.
+- PVC: leads with "PVC furniture"; adds PVC Mandir and Mariya (Loft) Storage,
+  plus a "What is mariya work?" FAQ.
+- Furniture: "every kind of furniture" — beds, study and dressing tables,
+  crockery and shoe units, shop counters, mariya.
+
+The token was delivered as a photo, so it was deleted right after.
+**Still to do:** the audit (item 7 below).
 
 The original list, for reference:
 
