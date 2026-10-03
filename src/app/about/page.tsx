@@ -13,15 +13,17 @@ import { FooterMap } from "@/components/FooterMap";
 import { Photo } from "@/components/Photo";
 import { SectionHead } from "@/components/SectionHead";
 import { ArrowIcon, PinIcon } from "@/components/icons";
+import { PAGES } from "@/data/seo";
+import { pageMetadata } from "@/lib/page-meta";
 import { getAboutPage, getDivisions, getSettings } from "@/sanity/loaders";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSettings();
-  return {
-    title: "About",
-    description: `${site.name} is a fabrication workshop in ${site.address.city}, run by ${site.owner}. Aluminium and glass, PVC profile and furniture — measured, made and fitted by our own team.`,
-    alternates: { canonical: "/about" },
-  };
+  return pageMetadata({
+    ...PAGES.about,
+    description: `${site.name} is ${site.owner}'s fabrication workshop in ${site.address.city}. Aluminium and glass, PVC and furniture — measured, made and fitted by our own team.`,
+    path: "/about",
+  });
 }
 
 /**

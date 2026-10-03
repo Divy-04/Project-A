@@ -9,9 +9,10 @@ furniture only because that's what he happened to have on hand; never let the
 site tilt that way.
 
 Primary job of this site is to **be found**. It has to rank locally for
-Himatnagar and the towns around it. A friend of the client handles SEO
-separately, so our obligation is to hand over something structurally
-SEO-clean: static HTML, real copy in the markup, fast, no CLS.
+Himatnagar and the towns around it. **We do the full SEO** — on-site and
+off-site plan. There is no separate SEO person; an earlier note said a
+friend of the client would handle it, and Divy corrected that on 3 Oct 2026.
+The floor is static HTML, real copy in the markup, fast, no CLS.
 
 ## Agreed sequence
 
@@ -838,24 +839,94 @@ text enforced in the Studio, no CLS, a page per project. This pass finishes the
 on-page and technical half. It was scheduled for 7 Sep and did not run; on
 13 Sep it was moved to after the first deploy so the workers.dev push is not
 held up, and on 2 Oct it became step 7 of the **Deployment plan**, with the
-Business Profile after it. Same list, same order. The SEO friend does off-site; the job here is
-handing over a site that does not hold them back.
+Business Profile after it. Same list, same order. We do the off-site work as
+well — see the owners below.
 
-In code, in this order:
+### Keyword research — 3 Oct 2026
+
+Done from Google's own autocomplete (`suggestqueries.google.com`, `gl=in`,
+English and Gujarati). These are not search volumes; there was no paid tool
+to hand. Autocomplete only suggests phrases people actually type. What it
+showed, and what the pass did about it:
+
+- **People say "PVC furniture", not "PVC profile".** "pvc profile" pulls
+  manufacturers and sheet suppliers (trade buyers). Local buyers type "pvc
+  furniture", "kaka pvc furniture", "pvc kitchen cabinets", "pvc wardrobe",
+  "pvc bathroom door" — and "પીવીસી ફર્નિચર". "himatnagar pvc furniture" and
+  "kaka pvc himatnagar" are real local searches. The division keeps its name
+  "PVC Profile" on screen; its title, description and copy lead with PVC
+  furniture.
+- Aluminium is searched by product: "aluminium sliding window", **"domal
+  window"**, "aluminium door", "aluminium partition for office", "glass
+  partition", "aluminium glass work"; in Gujarati "એલ્યુમિનિયમ બારી" and
+  "એલ્યુમિનિયમ દરવાજા".
+- Furniture: "modular kitchen in himatnagar", "himatnagar furniture shop",
+  "carpenter in himatnagar", "hdhmr kitchen".
+- "near me" and "price" ride on almost everything. "Near me" is decided by
+  the Business Profile and reviews, not the site — about 32% and 20% of local
+  ranking in the 2026 studies against ~15% on-page — which is why the Business
+  Profile and reviews are the off-site priority.
+
+Decided with Divy the same day: Nilesh makes **every kind of furniture**, PVC
+mandir and aluminium kitchens, so they are listed. **"Mariya"** is the loft
+storage over doors and windows, and it is a keyword. The division page
+headings were changed to the search phrases.
+
+**No Gujarati text and no prices on the site — Divy's decision, 3 Oct.**
+Both were built first:
+- a visible Gujarati line under the hero and each division heading;
+- "work from ₹2,000" under the call button, plus a price FAQ.
+
+Divy asked for both to come out, including in the structured data and on the
+share card. Do not add them back without asking. (He also asked whether the
+Gujarati could be hidden instead. It cannot: hidden keyword text is a Google
+spam violation.)
+
+### Done in code — 3 Oct 2026
+
+- `src/data/seo.ts` holds every title and description, and the division
+  page headings: "Aluminium Windows & Glass / PVC Furniture & Doors /
+  Furniture & Modular Kitchens in Himatnagar". It is the one exception to
+  "the Studio owns facts": search wording is tuned to research, not edited
+  casually. A division added in the Studio without an entry still gets a
+  heading and title from its own name.
+- `src/lib/page-meta.ts` builds each page's title, description, canonical
+  and Open Graph. It exists because Next merges `openGraph` shallowly, so a
+  page that sets any of it loses the layout's site name and the file-based
+  share image. The template is `%s – AADI ENTERPRISE`: a dash, not a pipe.
+- Structured data:
+  - `ServiceSchema` on each division, with its items as an OfferCatalog.
+  - `FaqSchema` on the division and contact FAQs. Google dropped FAQ rich
+    results in May 2026; this is kept for Bing and AI search.
+  - The business record gained a logo, an image, and opening hours parsed
+    from Site settings → hours. If the line cannot be read, the field is
+    left out. Site settings → Google Maps link fills `hasMap`/`sameAs`.
+  - `geo` waits for the real pin.
+- The sitemap carries `lastModified` from `_updatedAt` on project pages
+  only.
+- The share card `src/app/opengraph-image.png` (1200×630) and the icons
+  (`src/app/apple-icon.png`, `public/icons/*`) are static PNGs rendered once
+  with Chromium, not `next/og` at build: a static file costs the Worker
+  nothing. **The card prints the
+  phone number, so re-render it if the number changes.**
+- `app/manifest.ts`, `lang="en-IN"`, and theme colour = ground.
+- Optional build variables add verification and analytics:
+  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_BING_SITE_VERIFICATION`
+  and `NEXT_PUBLIC_CF_ANALYTICS_TOKEN`.
+- The hero copy says "PVC furniture and doors" in place of "PVC profile".
+
+**Still to do:** the Sanity half. The three Division documents get new
+blurbs, intros and item lists with the researched terms, plus a "What is
+mariya work?" FAQ on PVC. It is a patch of the existing documents, and it
+needs a short-lived Editor token. Then the audit (item 7 below).
+
+The original list, for reference:
 
 1. **Domain.** `siteUrl` fallback and `.env.example` → `https://aadienterprise.in`.
-2. **Titles and descriptions** rewritten to the commercial search terms —
-   "Aluminium Windows, Doors & Partitions in Himatnagar" rather than
-   "Aluminium & Glass in Himatnagar". Draft a page-by-page table first and get
-   Divy's approval so it does not clash with the friend's plan.
-3. **Open Graph image.** There is none. A branded card (logo, three divisions)
-   generated at build, until real photography replaces it.
-4. **Structured data.** `openingHoursSpecification` and `geo` on the business
-   record once hours and the pin are confirmed; a `Service` record on each
-   division page; `FAQPage` on the division and contact questions; per-project
-   `lastModified` in the sitemap from Sanity's `_updatedAt`; `sameAs` on the
-   business record reading Site settings → Google Maps link, so the Business
-   Profile URL arrives in step 8 with no code change.
+2. **Titles and descriptions** rewritten to the commercial search terms.
+3. **Open Graph image.** A branded card (logo, three divisions).
+4. **Structured data.** `Service`, `FAQPage`, hours, `sameAs`, sitemap
+   `lastModified` (all above); `geo` once the pin is confirmed.
 5. **Image weight — done 2 Oct 2026, pulled forward into deployment step 1**
    because Workers has no image optimiser and the 1 MB logo would otherwise
    ship on every page. The seven PNGs in use became WebP (11.4 MB → 422 KB:
@@ -877,11 +948,15 @@ Not code — with owners:
   from the site. Most of local ranking lives here. Its URL then goes into Site
   settings → Google Maps link.
 - **Search Console** (Divy, once the domain is live): DNS verification at
-  Cloudflare, submit the sitemap.
-- **Citations** (SEO friend): JustDial, IndiaMART, Sulekha, Bing Places, with
-  name, address and phone identical everywhere.
+  Cloudflare, submit the sitemap. Then **Bing Webmaster Tools**, imported
+  from Search Console — ChatGPT, Copilot and other AI search read Bing's index.
+- **Reviews** (Nilesh, from the day the Profile is verified): ask every past
+  customer with a QR card or a WhatsApp link, and reply to each review.
+  Recency counts most.
+- **Citations** (Divy): JustDial, IndiaMART, Sulekha, Bing Places, Apple
+  Business Connect, with name, address and phone identical everywhere.
 - **Content cadence** (Nilesh): a project a fortnight with the town in it.
-- **Backlinks** (SEO friend): start from the citation directories above. The
+- **Backlinks** (Divy): start from the citation directories above. The
   KDM dealer listing that was going to be the first link went with the
   partnership; Nilesh is not a listed dealer for Kaka or Polywood either.
 
@@ -941,8 +1016,8 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
       KDM removal and the Studio redeploy) deleted by Divy the same day.
 - [x] The `setup` Developer token deleted in Manage → API → Tokens (6 Sep
       2026). Nothing live uses one.
-- [ ] Nilesh invited to the Sanity project as **Editor** (Manage → Members),
-      and shown the Studio once: Projects → + → fill → upload → Publish.
+- [x] Nilesh invited to the Sanity project as **Editor** (Manage → Members),
+      3 Oct 2026. He is now verifying the projects and adding pictures.
 
 ## Open — needs a decision
 

@@ -22,8 +22,8 @@ export async function Hero() {
           </h1>
 
           <p className="mt-6 max-w-lg text-base leading-relaxed text-ink-2 sm:text-[1.0625rem]">
-            Three divisions under one workshop — aluminium and glass
-            fabrication, PVC profile, and made-to-measure furniture.
+            Three divisions under one workshop — aluminium windows and
+            glass, PVC furniture and doors, and made-to-measure furniture.
             All measured, fabricated and expertly installed by our team.
           </p>
 

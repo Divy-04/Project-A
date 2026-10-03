@@ -3,15 +3,12 @@ import { ElevationBackdrop } from "@/components/Backdrop";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CtaBand } from "@/components/CtaBand";
 import { GalleryBrowser } from "@/components/GalleryBrowser";
+import { PAGES } from "@/data/seo";
+import { pageMetadata } from "@/lib/page-meta";
 import { getDivisions, getProjects, getSettings } from "@/sanity/loaders";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSettings();
-  return {
-    title: "Our Work",
-    description: `Completed aluminium, glass, PVC profile and furniture projects across ${site.address.city} and ${site.address.district}. Photographs, location and what each job involved.`,
-    alternates: { canonical: "/gallery" },
-  };
+  return pageMetadata({ ...PAGES.gallery, path: "/gallery" });
 }
 
 /**

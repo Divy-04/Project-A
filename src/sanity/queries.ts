@@ -29,6 +29,7 @@ const PROJECT = /* groq */ `{
   location,
   completedOn,
   summary,
+  "updatedAt": _updatedAt,
   "division": division->${DIVISION_REF},
   "images": coalesce(images[]${IMAGE}, [])
 }`;

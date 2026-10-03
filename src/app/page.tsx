@@ -9,18 +9,13 @@ import { ServiceArea } from "@/components/home/ServiceArea";
 import { Testimonials } from "@/components/home/Testimonials";
 import { CtaBand } from "@/components/CtaBand";
 import { Marquee } from "@/components/Marquee";
+import { PAGES } from "@/data/seo";
+import { pageMetadata } from "@/lib/page-meta";
 import { imageUrl } from "@/sanity/image";
 import { getDivisions, getHomePage, getSettings } from "@/sanity/loaders";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSettings();
-  return {
-    alternates: { canonical: "/" },
-    description:
-      "Aluminium doors, windows, partitions and ACP glazing, PVC profile work, modular kitchens and wooden furniture in Himatnagar, Sabarkantha. Free site visit — call " +
-      site.phoneDisplay +
-      ".",
-  };
+  return pageMetadata({ description: PAGES.home.description, path: "/" });
 }
 
 export default async function HomePage() {

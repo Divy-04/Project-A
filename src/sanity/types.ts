@@ -60,6 +60,8 @@ export type Project = {
   /** ISO date; the site shows month and year only. */
   completedOn: string;
   summary: string;
+  /** Sanity's `_updatedAt` — the sitemap's lastModified for this page. */
+  updatedAt: string;
   images: SiteImage[];
 };
 

@@ -11,6 +11,8 @@ import { SectionHead } from "@/components/SectionHead";
 import { ArrowIcon, PhoneIcon } from "@/components/icons";
 import { formatCompleted } from "@/lib/format";
 import { telLink } from "@/lib/links";
+import { divisionWork } from "@/data/seo";
+import { pageMetadata } from "@/lib/page-meta";
 import {
   getDivision,
   getProject,
@@ -35,14 +37,18 @@ export async function generateMetadata({
   params,
 }: PageProps<"/gallery/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const [project, site] = await Promise.all([getProject(slug), getSettings()]);
   if (!project) return {};
 
-  return {
+  /* The owner's summary first, then a line that always names the division,
+     the town and the business — so a short summary still reads as a local
+     result for that kind of work. */
+  const summary = project.summary.trim().replace(/([^.!?])$/, "$1.");
+  return pageMetadata({
     title: `${project.title}, ${project.location}`,
-    description: project.summary,
-    alternates: { canonical: `/gallery/${project.slug}` },
-  };
+    description: `${summary} ${divisionWork(project.division)} in ${project.location} by ${site.name}.`,
+    path: `/gallery/${project.slug}`,
+  });
 }
 
 export default async function ProjectPage({

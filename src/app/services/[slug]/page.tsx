@@ -13,7 +13,11 @@ import { SectionHead } from "@/components/SectionHead";
 import { SpecList } from "@/components/SpecList";
 import { Swatches } from "@/components/Swatches";
 import { ArrowIcon, CheckIcon, PhoneIcon } from "@/components/icons";
+import { FaqSchema } from "@/components/FaqSchema";
+import { ServiceSchema } from "@/components/ServiceSchema";
+import { divisionSeo } from "@/data/seo";
 import { telLink } from "@/lib/links";
+import { pageMetadata } from "@/lib/page-meta";
 import {
   getDivision,
   getDivisions,
@@ -43,14 +47,15 @@ export async function generateMetadata({
   params,
 }: PageProps<"/services/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const [service, site] = await Promise.all([getDivision(slug), getSettings()]);
+  const service = await getDivision(slug);
   if (!service) return {};
 
-  return {
-    title: `${service.title} in ${site.address.city}`,
-    description: `${service.blurb} Serving ${site.address.city} and ${site.address.district}, Gujarat.`,
-    alternates: { canonical: `/services/${service.slug}` },
-  };
+  const seo = divisionSeo(service);
+  return pageMetadata({
+    title: seo.title,
+    description: seo.description,
+    path: `/services/${service.slug}`,
+  });
 }
 
 export default async function ServicePage({
@@ -66,12 +71,21 @@ export default async function ServicePage({
 
   const work = await getProjectsInDivision(service.slug);
   const others = divisions.filter((s) => s.slug !== service.slug);
+  const seo = divisionSeo(service);
 
   return (
     <>
+      <ServiceSchema
+        division={service}
+        name={seo.title}
+        description={seo.description}
+        areas={site.serviceAreas}
+      />
+      <FaqSchema faqs={service.faqs} />
+
       <PageHeader
         eyebrow={`Division · ${service.short}`}
-        title={`${service.title} in ${site.address.city}`}
+        title={seo.heading}
         intro={service.blurb}
         aside={
           <Button href={telLink(site)} size="lg">

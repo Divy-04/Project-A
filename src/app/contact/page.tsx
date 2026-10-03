@@ -13,16 +13,19 @@ import {
   PinIcon,
   WhatsAppIcon,
 } from "@/components/icons";
+import { FaqSchema } from "@/components/FaqSchema";
+import { PAGES } from "@/data/seo";
 import { mapsUrl, telLink, waLink } from "@/lib/links";
+import { pageMetadata } from "@/lib/page-meta";
 import { getDivisions, getSettings } from "@/sanity/loaders";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSettings();
-  return {
-    title: "Contact",
-    description: `Call ${site.phoneDisplay} or message on WhatsApp. ${site.name}, ${site.address.line1}, ${site.address.city}, ${site.address.district}. Free site visit and measurement.`,
-    alternates: { canonical: "/contact" },
-  };
+  return pageMetadata({
+    ...PAGES.contact,
+    description: `Call ${site.phoneDisplay} or WhatsApp. ${site.address.line1}, ${site.address.city}, ${site.address.district}. Free site visit, measurement and quote.`,
+    path: "/contact",
+  });
 }
 
 /**
@@ -289,6 +292,7 @@ export default async function ContactPage() {
           </div>
           <div className="lg:col-span-7">
             <Faqs faqs={faqs} />
+            <FaqSchema faqs={faqs} />
           </div>
         </div>
       </section>
