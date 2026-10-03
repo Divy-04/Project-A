@@ -8,7 +8,7 @@ export type Crumb = { href: string; label: string };
  *
  * Emits BreadcrumbList JSON-LD alongside the visible trail. Google builds the
  * breadcrumb shown under a search result from this, and a result that shows
- * "aadienterprise.com › Our Work › Aluminium & Glass" reads as a real site
+ * "aadienterprise.in › Our Work › Aluminium & Glass" reads as a real site
  * rather than a loose page — worth the handful of bytes.
  */
 export function Breadcrumbs({ trail }: { trail: Crumb[] }) {

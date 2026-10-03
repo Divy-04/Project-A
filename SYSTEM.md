@@ -250,9 +250,10 @@ value that is already correct in the HTML.
 
 Design approved. Sanity and the Brevo enquiry form are built, tested and
 pushed (last commit `5828ea6`, 13 Sep 2026, which also removed the ended KDM
-distributorship — the division is now "PVC Profile"). **Deployment has not
-started.** The full plan, revised on 2 Oct 2026, is in `CLAUDE.md` under
-*Deployment plan*; the short version:
+distributorship — the division is now "PVC Profile"). **Deployment started
+2 Oct 2026; the site is live at https://aadienterprise.in since 3 Oct.** The
+full plan, revised on 2 Oct 2026, is in `CLAUDE.md` under *Deployment plan*;
+the short version:
 
 1. Cloudflare account (Divy's email), then Workers via the OpenNext adapter,
    on workers.dev first.
@@ -260,11 +261,13 @@ started.** The full plan, revised on 2 Oct 2026, is in `CLAUDE.md` under
 3. Real content in the Studio — every project and testimonial is still a
    placeholder.
 4. `aadienterprise.in` bought on Nilesh's account, nameservers to Cloudflare,
-   domain attached.
+   domain attached. **Done 3 Oct 2026** (Hostinger, 2 years, auto-renew off
+   until Nilesh adds his own payment method; www → apex redirect rule).
 5. Site URL switched to `.in`, workers.dev turned off.
 6. Brevo authenticated on the domain; sender `enquiry@aadienterprise.in`.
-7. Search Console and the SEO pass in code.
-8. Google Business Profile, last.
+7. Hand over to Nilesh; the SEO pass in code during his week of fixing the
+   project details.
+8. After that week: Google Business Profile, then Search Console.
 
 ## Picking this up on another machine
 
@@ -314,8 +317,9 @@ under *Before it can go live*.
 
 ## Decisions
 
-- **Domain: `aadienterprise.in`** (6 Sep). Not yet bought; Divy buys it on
-  Nilesh's account, registrant in Nilesh's name (2 Oct). Cloudflare Registrar
+- **Domain: `aadienterprise.in`** (6 Sep). Bought 3 Oct 2026 by Divy at
+  Hostinger on Nilesh's account, registrant in Nilesh's name, expiring around
+  3 Oct 2028. Cloudflare Registrar
   does not sell `.in`, so an Indian registrar with nameservers moved to
   Cloudflare.
 - **Hosting: Cloudflare Workers** via `@opennextjs/cloudflare` (6 Sep; order

@@ -744,6 +744,24 @@ Profile inside the SEO pass. Each step waits on the one before it.
    account** at an Indian registrar (Cloudflare Registrar does not sell `.in`
    — checked 13 Sep), registrant in Nilesh's name and address — it is his
    business's asset. Nameservers to Cloudflare, domain attached to the Worker.
+   **Step 4 done, 3 Oct.** Bought at **Hostinger** on Nilesh's account, 2
+   years (₹1,240 with GST, paid once by Divy's UPI), so it expires around
+   **3 Oct 2028**. Auto-renew is **off** and Divy's UPI mandate is cancelled:
+   at handover Nilesh adds his own payment method and turns auto-renew on.
+   Hostinger's free "Unlimited" hosting trial was cancelled. Nameservers are
+   `cleo` and `yolanda.ns.cloudflare.com`; DNSSEC was off. The zone is on
+   Cloudflare **Free** in Divy's account, with Hostinger's parking records
+   deleted and "bot preference sync" left off (it would prepend Cloudflare's
+   lines to our robots.txt). The apex is a Worker **custom domain**, so
+   Cloudflare owns its DNS record and certificate. `www` is a proxied `AAAA
+   100::` placeholder plus a redirect rule from the "WWW to root" template
+   (`https://www.*` → `https://${1}`, 301, query string kept). **Always Use
+   HTTPS** is on, because without it `http://www` returned a 522 and
+   `http://` served the page unencrypted. Verified: http/https × www/apex all
+   end on `https://aadienterprise.in/<same path>`, and an unknown path 404s.
+   If the domain ever lapses, renewing restores everything because the DNS
+   lives at Cloudflare; only check that Hostinger has not reset the
+   nameservers to its parking pair.
 5. **Switch to the domain.** `NEXT_PUBLIC_SITE_URL` → `https://aadienterprise.in`
    and redeploy; the `siteUrl` fallback and `.env.example` changed to `.in` in
    code; the workers.dev route turned off so Google only ever sees one copy.
@@ -753,14 +771,23 @@ Profile inside the SEO pass. Each step waits on the one before it.
    still land in the business Gmail (`ENQUIRY_TO`). If the address should also
    receive mail, Cloudflare Email Routing forwards it to that Gmail for free.
    Send a real test enquiry; Nilesh marks it not spam.
-7. **Search Console and the SEO pass in code** — see **SEO pass** below.
-8. **Google Business Profile, last.** Nothing on the site depends on it, and
-   doing it after the site means the name, address, phone and hours are
-   already settled and are copied across exactly. The cost is time:
-   verification (video or postcard) takes days to weeks, and the map pack
+7. **Hand over, then the SEO pass in code during Nilesh's week** — see
+   **SEO pass** below. Nilesh gets a Sanity Editor invite and one
+   walkthrough, and spends about a week correcting the seven projects (their
+   titles, towns, dates and summaries are still seed placeholders; the photos
+   and the three testimonials are real — confirmed by Divy 2 Oct). The SEO
+   code goes in meanwhile, so Google's first read is the finished site.
+8. **After Nilesh's week: Google Business Profile, then Search Console.**
+   Search Console is the gate — submitting the sitemap is what tells Google
+   to read the site, so it waits until the projects are real. No "noindex"
+   switch was added: a new domain with no links is unlikely to be crawled
+   within the week, and a switch someone forgets to turn off is worse than a
+   week of placeholder text (decided 2 Oct). The Business Profile's name,
+   address, phone and hours are copied exactly from the finished site.
+   Verification (video or postcard) takes days to weeks, and the map pack
    waits on it. Once verified, paste the listing URL into Site settings →
-   Google Maps link. The SEO pass wires `sameAs` to that same field, so this
-   step needs no code.
+   Google Maps link — the SEO pass wires `sameAs` to that field, so this
+   needs no code.
 
 Accounts: Cloudflare on **Divy's email**; the domain on **Nilesh's account**,
 so the domain is his and he can point it elsewhere whatever happens to the
@@ -862,9 +889,12 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
       Gmail inbox (2 Oct 2026). Repeat once the sender moves to the domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the real domain — canonicals, the sitemap,
       robots.txt and the LocalBusiness JSON-LD all build off it.
-- [ ] Cloudflare account on **Divy's email**; `aadienterprise.in` bought on
+- [x] Cloudflare account on **Divy's email**; `aadienterprise.in` bought on
       **Nilesh's account**, registrant in his name. Nameservers moved to
-      Cloudflare, domain attached to the Worker, workers.dev route turned off.
+      Cloudflare, domain attached to the Worker (3 Oct 2026).
+- [ ] workers.dev route turned off once the canonicals say `.in`.
+- [ ] Nilesh adds his own payment method at Hostinger and turns auto-renew
+      on; the domain expires around 3 Oct 2028.
 - [ ] The 9 placeholder projects replaced with real jobs or deleted.
 - [ ] Brevo sender moved from the developer's Gmail to the real domain (DNS
       verification in Brevo), so the From line carries the business.
@@ -892,11 +922,11 @@ Deployment (step 3) started on 2 Oct 2026. Nothing here may be skipped.
 
 ## Open — needs a decision
 
-- **The real domain — decided 6 Sep: aadienterprise.in**, to be bought by
-  Divy on Nilesh's account (step 4 of the **Deployment plan**). Until then `siteUrl` in
-  `src/lib/site-url.ts` still falls back to the old `.com` guess. Canonical URLs, the sitemap, robots.txt and the
-  LocalBusiness JSON-LD all build off it. Overridable at build time with
-  `NEXT_PUBLIC_SITE_URL`, which is what the host will set.
+- **The real domain — aadienterprise.in, bought 3 Oct 2026** on Nilesh's
+  Hostinger account (step 4 of the **Deployment plan**). `siteUrl` in
+  `src/lib/site-url.ts` falls back to it. Canonical URLs, the sitemap,
+  robots.txt and the LocalBusiness JSON-LD all build off it. Overridable at
+  build time with `NEXT_PUBLIC_SITE_URL`, which Workers Builds sets.
 - **Hosting — decided 6 Sep: Cloudflare.** Two things to know. The old
   Cloudflare Pages adapter for Next is frozen and does not support Next 16;
   the supported path is Cloudflare's OpenNext adapter, deploying to Workers

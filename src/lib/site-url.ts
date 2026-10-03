@@ -4,8 +4,8 @@
  *
  * Infrastructure, not content — it belongs to the deployment, not to the
  * editor, which is why it is an environment variable rather than a Sanity
- * field. TBC: the fallback is a guess at the real domain.
+ * field. The fallback is the live domain, bought 3 Oct 2026.
  */
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://aadienterprise.com"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://aadienterprise.in"
 ).replace(/\/$/, "");
