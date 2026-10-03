@@ -45,8 +45,11 @@ export async function Hero() {
         </div>
 
         {/* Asymmetric image pair. Ratios here are final — the photographs from
-            the Studio drop in without shifting the layout. Above the fold, so
-            they load eagerly. */}
+            the Studio drop in without shifting the layout. Only the lead image
+            is `priority`: it is the page's LCP, and three high-priority
+            preloads made the two small ones compete with it for the
+            connection (Lighthouse, 3 Oct 2026). The small pair still loads
+            promptly — lazy images inside the viewport are fetched at once. */}
         <div className="lg:col-span-6">
           <div className="relative">
             <Photo
@@ -62,7 +65,6 @@ export async function Hero() {
               <Photo
                 image={home.heroSmallLeft}
                 ratio="4/3"
-                priority
                 sizes="(min-width: 1024px) 22vw, 45vw"
                 label="Modular Kitchen"
                 sublabel="4:3"
@@ -71,7 +73,6 @@ export async function Hero() {
               <Photo
                 image={home.heroSmallRight}
                 ratio="4/3"
-                priority
                 sizes="(min-width: 1024px) 22vw, 45vw"
                 label="Office Partition"
                 sublabel="4:3"

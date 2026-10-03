@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { preconnect } from "react-dom";
 import { Archivo } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
@@ -67,6 +68,11 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const site = await getSettings();
+
+  /* Every photograph comes from Sanity's CDN, a second origin. Opening that
+     connection with the HTML, instead of when the first <img> is parsed,
+     takes the DNS and TLS round trips off the hero image's critical path. */
+  preconnect("https://cdn.sanity.io");
 
   return (
     <html lang="en-IN" className={`${archivo.variable} h-full antialiased`}>
