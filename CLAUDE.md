@@ -44,6 +44,59 @@ revised with Divy — Cloudflare on Divy's email, the domain bought on Nilesh's
 account, the Business Profile moved to the very end — see **Deployment plan**.
 Step 3 starts now, with the Cloudflare account.
 
+**Where it stands (3 Oct 2026) — the code side is finished.**
+
+Live at **https://aadienterprise.in**:
+- the domain is on Nilesh's account; `www` and `http` redirect to it;
+  workers.dev is off;
+- enquiries are sent from `enquiry@aadienterprise.in` and reach the business
+  inbox;
+- a publish in Sanity goes live in about 1–2 minutes;
+- the SEO pass and the audit are done.
+
+Every change is pushed to Divy-04/Project-A `main`. Nothing more is planned
+in code.
+
+What remains is on the client side, in this order:
+
+1. **Hostinger auto-renew** (Nilesh, with Divy). Nilesh signs in with his
+   Gmail, adds his own card or UPI AutoPay under Billing, and turns
+   auto-renew on for aadienterprise.in. The domain is paid until about
+   3 Oct 2028. Divy's UPI mandate was cancelled.
+2. **Nilesh's week in the Studio** (he is already an Editor):
+   - correct the 7 projects — real titles, towns, completion dates and
+     summaries;
+   - send his portrait for About page → Owner portrait;
+   - confirm the TBC details: division specs, PIN code, About milestone
+     years, WhatsApp number, and the towns he travels to.
+3. **Google Business Profile** (Divy, with Nilesh for verification). Create
+   and verify it with the name, address, phone and hours copied exactly from
+   the site. Pick the primary category to match the division that earns
+   most, list all three divisions as services, and add photos and the
+   website link. Once it is verified, paste the listing URL into Studio →
+   Site settings → **Google Maps link** and publish. That feeds `sameAs` /
+   `hasMap` with no code change.
+4. **Google Search Console** (Divy). Add a Domain property for
+   aadienterprise.in, put Google's TXT record in Cloudflare → DNS → Records,
+   verify, then Sitemaps → submit `sitemap.xml`. Do this only after step 2:
+   the submission is what tells Google to read the site.
+5. **Bing Webmaster Tools** (Divy). Sign in and import from Search Console.
+   It also feeds ChatGPT and Copilot search.
+6. **Listings and reviews.** Divy lists the business on JustDial, IndiaMART,
+   Sulekha, Bing Places and Apple Business Connect, with name, address and
+   phone identical everywhere. Nilesh asks past customers for Google reviews
+   and replies to each one.
+7. **Ongoing** (Nilesh): a new project every fortnight, with the town in the
+   title.
+
+Code would only be touched again for:
+- a new phone number — the share card `src/app/opengraph-image.png` prints
+  it and has to be re-rendered; the number on the site itself is changed in
+  Sanity;
+- adding `geo` coordinates (optional, since the Business Profile carries
+  the pin);
+- a new feature or design change.
+
 Because deployment comes last, the enquiry form being unconfigured during
 step 1 costs nothing: the site is not public, so there is no real enquiry to
 lose. It must be wired in step 2 regardless — it cannot ship disconnected.

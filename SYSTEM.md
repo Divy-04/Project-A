@@ -267,8 +267,15 @@ the short version:
 6. Brevo authenticated on the domain; sender `enquiry@aadienterprise.in`.
    **Done 3 Oct 2026**, test enquiry landed in the inbox.
 7. Hand over to Nilesh; the SEO pass in code during his week of fixing the
-   project details.
+   project details. **Code side done 3 Oct 2026**: Nilesh is invited as
+   Editor, and the SEO pass and the Lighthouse/Googlebot audit are live.
 8. After that week: Google Business Profile, then Search Console.
+
+**The code is finished.** What remains is client-side: Hostinger auto-renew,
+Nilesh's week in the Studio, the Business Profile (its link goes into Site
+settings), Search Console with the TXT record in Cloudflare and the sitemap,
+Bing import, then listings and reviews. The full checklist with owners is
+in `CLAUDE.md` under *Where it stands (3 Oct 2026)*.
 
 ## Picking this up on another machine
 
